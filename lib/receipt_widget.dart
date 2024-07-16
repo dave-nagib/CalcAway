@@ -9,12 +9,12 @@ class ReceiptWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFD5B390),
+      color: const Color(0xFF7D8491),
       child: Column(
         children: [
           AppBar(
             toolbarHeight: 65.0,
-            backgroundColor: const Color(0xFF3C2317),
+            backgroundColor: const Color(0xFF202C39),
             centerTitle: true,
             title: Text(
               'Total: ${receipt.totalCost()}',

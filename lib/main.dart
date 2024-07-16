@@ -52,18 +52,29 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEADBC8),
+      backgroundColor: const Color(0xFF202C39),
       appBar: AppBar(
         toolbarHeight: 80.0,
         centerTitle: true,
-        title: const Text(
-          'ينبوع الكتب',
-          style: TextStyle(
-            fontSize: 40.0,
-            fontFamily: 'Musamim'
-          ),
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ImageIcon(
+                AssetImage('assets/images/calcaway-logo.png'),
+                size: 40.0
+            ),
+            SizedBox(width: 7.5),
+            Text(
+              'CalcAway',
+              style: TextStyle(
+                fontSize: 45.0,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Saira'
+              ),
+            ),
+          ]
         ),
-        backgroundColor: const Color(0xff032940),
+        backgroundColor: const Color(0xff08090a),
       ),
       body: ListView.builder(
         itemCount: items.getItems().length,
@@ -73,33 +84,33 @@ class _MyAppState extends State<MyApp> {
         Container(
           margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
           child: FloatingActionButton(
-            backgroundColor: const Color(0xff032940),
+            backgroundColor: const Color(0xff08090a),
             onPressed: () => showAdaptiveDialog(
               context: context,
               builder: (context) => EditListDialog(itemManager: items)
             ),
-            child: const Icon(Icons.edit, color: Color(0xFFEADBC8), size: 30.0)
+            child: const Icon(Icons.edit, color: Color(0xFFD9D9D9), size: 30.0)
           ),
         ), // Edit
         Container(
           margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
           child: FloatingActionButton(
-              backgroundColor: const Color(0xff032940),
+              backgroundColor: const Color(0xff08090a),
               onPressed: () => {
                 setState(() => mainReceipt.reset())
               },
-              child: const Icon(Icons.restart_alt, color: Color(0xFFEADBC8), size: 35.0)
+              child: const Icon(Icons.restart_alt, color: Color(0xFFD9D9D9), size: 35.0)
           ),
         ), // Reset/Rebuild
         Container(
           margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
           child: FloatingActionButton(
-              backgroundColor: const Color(0xff032940),
+              backgroundColor: const Color(0xff08090a),
               onPressed: () => showModalBottomSheet(
                   context: context,
                   builder: (context) => ReceiptWidget(receipt: mainReceipt)
               ),
-              child: const Icon(Icons.receipt, color: Color(0xFFEADBC8), size: 30.0)
+              child: const Icon(Icons.receipt, color: Color(0xFFD9D9D9), size: 30.0)
           ),
         ), // Receipt
       ],

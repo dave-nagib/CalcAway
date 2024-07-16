@@ -12,12 +12,12 @@ class EditListDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      backgroundColor: const Color(0xFFFAEDCD),
+      backgroundColor: const Color(0xFF7D8491),
       title: const Center(child: Text('Add/Remove Items')),
       titleTextStyle: const TextStyle(
         fontSize: 30.0,
         fontWeight: FontWeight.bold,
-        color: Colors.black,
+        color: Color(0xFFFFFFFF),
       ),
       content: SizedBox(
         height: 130.0,
@@ -67,8 +67,8 @@ class EditListDialog extends StatelessWidget {
             },
             style: TextButton.styleFrom(
               fixedSize: const Size(75.0, 45.0),
-              foregroundColor: const Color(0xFFD6F5F3),
-              backgroundColor: const Color(0xFF102C57)
+              foregroundColor: const Color(0xFFFFFFFF),
+              backgroundColor: const Color(0xFF202C39)
             ),
             child: const Text(
               'Delete',
@@ -104,8 +104,8 @@ class EditListDialog extends StatelessWidget {
             },
             style: TextButton.styleFrom(
               fixedSize: const Size(75.0, 45.0),
-              foregroundColor: const Color(0xFFD6F5F3),
-              backgroundColor: const Color(0xFF102C57)
+                foregroundColor: const Color(0xFFFFFFFF),
+                backgroundColor: const Color(0xFF202C39)
             ),
             child: const Text(
               'Add',
@@ -121,8 +121,8 @@ class EditListDialog extends StatelessWidget {
           },
           style: TextButton.styleFrom(
             fixedSize: const Size(75.0, 45.0),
-            foregroundColor: const Color(0xFFD6F5F3),
-            backgroundColor: const Color(0xFF102C57)
+              foregroundColor: const Color(0xFFFFFFFF),
+              backgroundColor: const Color(0xFF202C39)
           ),
           child: const Text(
             'Cancel',

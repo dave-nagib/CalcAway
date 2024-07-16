@@ -12,14 +12,14 @@ class ItemCountWidget extends StatefulWidget {
 
 class _ItemCountWidgetState extends State<ItemCountWidget> {
 
-  Color? getCountColor (int count) => (count == 0)? const Color(0xFFAB8F73) : const Color(0xff321E1E);
+  Color? getCountColor (int count) => (count == 0)? const Color(0xff253b3d) : const Color(0xffC6EBBE);
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 7.5,
       shadowColor: Colors.black,
-      color: const Color(0xFFD5B390),
+      color: const Color(0xFF08090A),
       margin: const EdgeInsets.fromLTRB(15.0, 18.0, 15.0, 0.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -30,10 +30,10 @@ class _ItemCountWidgetState extends State<ItemCountWidget> {
             child: Text(
               widget.item.name,
               style: const TextStyle(
-                color: Color(0xff021927),
-                fontSize: 19.0,
-                fontWeight: FontWeight.w800,
-                fontFamily: 'Dinarone'
+                color: Color(0xffD9D9D9),
+                fontSize: 23.0,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'REM'
               ),
             ),
           ),
@@ -43,7 +43,7 @@ class _ItemCountWidgetState extends State<ItemCountWidget> {
                 if(widget.item.removeOne()) widget.receipt.removeFromReceipt(widget.item)
               })
             },
-            backgroundColor: const Color(0xFF9B1212),
+            backgroundColor: const Color(0xFF730C0C),
             child: const Text(
               '-',
               style: TextStyle(
@@ -67,7 +67,7 @@ class _ItemCountWidgetState extends State<ItemCountWidget> {
                 if(widget.item.addOne()) widget.receipt.addToReceipt(widget.item)
               })
             },
-            backgroundColor: const Color(0xFF435334),
+            backgroundColor: const Color(0xFF38482C),
             child: const Text(
               '+',
               style: TextStyle(
