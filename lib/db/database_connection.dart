@@ -1,9 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'item.dart';
-import 'receipt.dart';
 
-class DAO {
+class DatabaseConnection {
 
   // Single Database object instance that will be referenced across the whole application
   static Database? _db;
@@ -13,7 +11,7 @@ class DAO {
     db.execute('''
       CREATE TABLE item (
         name TEXT PRIMARY KEY,
-        cost REAL
+        price REAL
       );
       
       CREATE TABLE receipt (
@@ -49,11 +47,4 @@ class DAO {
     _db ??= await _initializeDatabase();
     return _db!;
   }
-
-  // TODO define a generic insert function with a mapper as input?
-  // TODO define a generic query function with a mapper as input?
-  // TODO define a generic delete function with the key name and value as input?
-  // TODO define a generic update function with the key name and value as input?
-
-  // TODO another way is to just make this class abstract and extend it for every other object and implement class-specific methods
 }
