@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:item_calculator/edit_list_dialog.dart';
+import 'edit_list_dialog.dart';
 import 'item_count_widget.dart';
 import 'receipt_widget.dart';
 import 'receipt.dart';

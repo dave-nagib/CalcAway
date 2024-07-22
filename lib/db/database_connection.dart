@@ -10,8 +10,9 @@ class DatabaseConnection {
   _dbCreate(Database db, int version) {
     db.execute('''
       CREATE TABLE item (
-        name TEXT PRIMARY KEY,
-        price REAL
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        price REAL NOT NULL
       );
       
       CREATE TABLE receipt (
@@ -20,11 +21,11 @@ class DatabaseConnection {
       );
       
       CREATE TABLE receipt_details (
-        item_name TEXT,
-        transact_id INTEGER,
+        transact_id INTEGER NOT NULL,
+        item_id INTEGER DEFAULT -1,
         count INTEGER NOT NULL CHECK(count > 0),
-        FOREIGN KEY (item_name) REFERENCES item(name),
-        FOREIGN KEY (transact_id) REFERENCES receipt(id)
+        FOREIGN KEY (transact_id) REFERENCES receipt(id) ON DELETE CASCADE
+        FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE SET DEFAULT,
       );
     ''');
   }
