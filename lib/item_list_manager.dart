@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'item.dart';
 
@@ -21,8 +20,8 @@ class ItemListManager {
           .map( (dyn) => Item.fromJson(dyn) ).toList();
     }else{
       items = [
-        Item('Item fetching', 30),
-        Item('Failed', 40)
+        Item(name: 'Item fetching', price: 30),
+        Item(name: 'Failed', price: 40)
       ];
     }
   }
@@ -40,7 +39,7 @@ class ItemListManager {
     if(found || price <= 0) {
       return false;
     }else{
-      items.add(Item(name, price));
+      items.add(Item(name: name, price: price));
     }
     writeItems();
     return true;

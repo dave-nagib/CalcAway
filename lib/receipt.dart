@@ -4,12 +4,12 @@ class Receipt {
 
   final int? id;
   final DateTime? timestamp;
-  List<Item> nonZeroItems = [];
+  final List<Item> nonZeroItems;
 
   Receipt({
     this.id,
     this.timestamp,
-    required this.nonZeroItems
+    this.nonZeroItems = const []
   });
 
   void addToReceipt (Item something) {
