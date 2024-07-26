@@ -1,3 +1,4 @@
+import 'package:calc_away/db/database_connection.dart';
 import 'package:flutter/cupertino.dart';
 import '../item.dart';
 import 'package:sqflite/sqflite.dart';
@@ -5,6 +6,9 @@ import '../receipt.dart';
 import 'dao.dart';
 
 class ReceiptDAO extends DAO<Receipt> {
+
+  ReceiptDAO(DatabaseConnection dc) : super(dc);
+
   @override
   Future<Receipt?> add(Receipt t) async {
     var db = await databaseConnection.db;
@@ -38,11 +42,11 @@ class ReceiptDAO extends DAO<Receipt> {
   }
 
   @override
-  Future<int> delete(Receipt t) async {
+  Future<int> delete(int id) async {
     try {
       var db = await databaseConnection.db;
       // Will return the number of rows affected on normal completion
-      return await db.delete('receipt', where: 'id = ?', whereArgs: [t.id]);
+      return await db.delete('receipt', where: 'id = ?', whereArgs: [id]);
     } on Exception catch(e,st) {
       debugPrint('Error: $e');
       debugPrintStack(stackTrace: st);
@@ -51,11 +55,11 @@ class ReceiptDAO extends DAO<Receipt> {
   }
 
   @override
-  Future<Receipt?> get(Object id) async {
+  Future<Receipt?> get(int id) async {
     var db = await databaseConnection.db;
     try {
       // Fetch the receipt entry by id
-      var idAndTime = (await db.query('receipt', where: 'id = ?', whereArgs: [id as int])).firstOrNull;
+      var idAndTime = (await db.query('receipt', where: 'id = ?', whereArgs: [id])).firstOrNull;
       if (idAndTime == null) throw Exception('Error in finding receipt entry.');
       // Construct a new item list object
       List<Item> items = [];
@@ -81,11 +85,16 @@ class ReceiptDAO extends DAO<Receipt> {
 
   /// Returns a list of multiple receipts without their items list from the database with filtering options. Returns null on error.
   @override
-  Future<List<Receipt>?> getMultiple(String? where, List<String>? whereArgs) async {
+  Future<List<Receipt>?> getMultiple({String? where, List<String>? whereArgs}) async {
     var db = await databaseConnection.db;
     try {
       // Fetch all receipts and order them from newest to oldest
-      var maps = await db.query('receipt', orderBy: 'timestamp DESC', where: where, whereArgs: whereArgs);
+      List<Map<String, Object?>> maps;
+      if (where == null) {
+        maps = await db.query('receipt', orderBy: 'timestamp DESC');
+      } else {
+        maps = await db.query('receipt', orderBy: 'timestamp DESC', where: where, whereArgs: whereArgs);
+      }
       return maps.map((e) => {
             Receipt(
                 id: e['id'] as int,

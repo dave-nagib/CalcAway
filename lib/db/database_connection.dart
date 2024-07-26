@@ -7,25 +7,27 @@ class DatabaseConnection {
   static Database? _db;
 
   // Function which executes the database creation if the schema doesn't exist
-  _dbCreate(Database db, int version) {
-    db.execute('''
+  _dbCreate(Database db, int version) async {
+    await db.execute('''
       CREATE TABLE item (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
         price REAL NOT NULL
       );
-      
+    ''');
+    await db.execute('''
       CREATE TABLE receipt (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT DEFAULT CURRENT_TIMESTAMP
       );
-      
+    ''');
+    await db.execute('''
       CREATE TABLE receipt_details (
         transact_id INTEGER NOT NULL,
         item_id INTEGER DEFAULT -1,
         count INTEGER NOT NULL CHECK(count > 0),
-        FOREIGN KEY (transact_id) REFERENCES receipt(id) ON DELETE CASCADE
-        FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE SET DEFAULT,
+        FOREIGN KEY (transact_id) REFERENCES receipt(id) ON DELETE CASCADE,
+        FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE SET DEFAULT
       );
     ''');
   }
