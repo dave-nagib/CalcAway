@@ -17,7 +17,7 @@ class ReceiptWidget extends StatelessWidget {
             backgroundColor: const Color(0xFF202C39),
             centerTitle: true,
             title: Text(
-              'Total: ${receipt.totalCost()}',
+              'Total: ${receipt.cost}',
               style: const TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold),
             ),
           ),
@@ -26,7 +26,7 @@ class ReceiptWidget extends StatelessWidget {
             child: SizedBox(
               height: 350.0,
               child: ListView.builder(
-                itemCount: receipt.nonZeroItems.length,
+                itemCount: receipt.nonZeroItems.entries.length,
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 5.0),
                   child: Row(
@@ -36,7 +36,7 @@ class ReceiptWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            receipt.nonZeroItems[index].name,
+                            receipt.nonZeroItems.entries.elementAt(index).key.name,
                             style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.w700),
                           )
                         ],
@@ -45,7 +45,7 @@ class ReceiptWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            '${receipt.nonZeroItems[index].price} X ${receipt.nonZeroItems[index].count}',
+                            '${receipt.nonZeroItems.entries.elementAt(index).key.price} X ${receipt.nonZeroItems.entries.elementAt(index).value}',
                             style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
                           )
                         ],

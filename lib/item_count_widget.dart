@@ -48,9 +48,7 @@ class _ItemCountWidgetState extends State<ItemCountWidget> {
                   width: 53.0,
                   child: FloatingActionButton( // THE SUBTRACT BUTTON
                     onPressed: () => {
-                      setState(() => {
-                        if(widget.item.removeOne()) widget.receipt.removeFromReceipt(widget.item)
-                      })
+                      setState(() => widget.receipt.removeOneOf(widget.item))
                     },
                     backgroundColor: const Color(0xFF730C0C),
                     child: const Text(
@@ -64,9 +62,9 @@ class _ItemCountWidgetState extends State<ItemCountWidget> {
                   ),
                 ),
                 Text(
-                  '${widget.item.count}',
+                  '${widget.receipt.nonZeroItems[widget.item]}',
                   style: TextStyle(
-                    color: getCountColor(widget.item.count),
+                    color: getCountColor(widget.receipt.nonZeroItems[widget.item]!),
                     fontFamily: 'Saira',
                     fontSize: 43.0,
                     fontWeight: FontWeight.w800
@@ -76,9 +74,7 @@ class _ItemCountWidgetState extends State<ItemCountWidget> {
                   width: 53.0,
                   child: FloatingActionButton( // THE ADD BUTTON
                     onPressed: () => {
-                      setState(() => {
-                        if(widget.item.addOne()) widget.receipt.addToReceipt(widget.item)
-                      })
+                      setState(() => widget.receipt.addOneOf(widget.item))
                     },
                     backgroundColor: const Color(0xFF38482C),
                     child: const Text(

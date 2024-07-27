@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:sqflite/sqflite.dart';
-
 import 'mocks/mock_database_connection.dart';
 import 'package:calc_away/db/item_dao.dart';
 import 'package:test/test.dart';

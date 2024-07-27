@@ -27,8 +27,8 @@ class ReceiptDAO extends DAO<Receipt> {
         );
         // Batch insert the receipt items into the receipt_details table
         Batch batch = txn.batch();
-        for (Item item in t.nonZeroItems) {
-          batch.insert('receipt_details', {'transact_id': recId, 'item_id': item.id, 'count': item.count});
+        for (var entry in t.nonZeroItems.entries) {
+          batch.insert('receipt_details', {'transact_id': recId, 'item_id': entry.key.id, 'count': entry.value});
         }
         await batch.commit();
         // Return the created Receipt object
@@ -62,13 +62,13 @@ class ReceiptDAO extends DAO<Receipt> {
       var idAndTime = (await db.query('receipt', where: 'id = ?', whereArgs: [id])).firstOrNull;
       if (idAndTime == null) throw Exception('Error in finding receipt entry.');
       // Construct a new item list object
-      List<Item> items = [];
+      Map<Item,int> items = {};
       // Fetch all items included in receipt from receipt_details
       var itemMaps = await db.query('receipt_details', where: 'transact_id = ?', whereArgs: [id]);
       if (itemMaps.isEmpty) throw Exception('Empty receipt found.');
       for (Map entry in itemMaps) {
         var itemMap = (await db.query('item', where: 'id = ?', whereArgs: [entry['item_id']])).first;
-        items.add(Item.fromMap(itemMap));
+        items[Item.fromMap(itemMap)] = entry['count'];
       }
       // Return the Receipt object
       return Receipt(
@@ -99,7 +99,7 @@ class ReceiptDAO extends DAO<Receipt> {
             Receipt(
                 id: e['id'] as int,
                 timestamp: DateTime.parse(e['timestamp'] as String),
-                nonZeroItems: []
+                nonZeroItems: {}
             )
       }) as List<Receipt>;
     } on Exception catch(e,st) {
