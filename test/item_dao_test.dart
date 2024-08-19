@@ -127,7 +127,7 @@ void main() {
   );
 
   test(
-    'Add, fetch, update, fetch again, then delete.',
+    'Add, fetch, update, fetch again, then delete item.',
       () async {
         // Add item by DAO
         Item? created = await sut.add(Item(name: 'Test Item 7', price: 432.1));
@@ -157,7 +157,7 @@ void main() {
   );
 
   test(
-    'Delete and update negative ID.',
+    'Delete and update negative ID item.',
       () async {
         expect(await sut.delete(-1), 0);
         expect(await sut.update(Item(id: -2, name: 'Fake Item', price: 9.89)), 0);
@@ -165,7 +165,7 @@ void main() {
   );
 
   test(
-    'Fetch all only.',
+    'Fetch all items only.',
       () async {
         // Add multiple items directly by db
         Batch b = (await mdc.db).batch();
@@ -188,7 +188,7 @@ void main() {
   );
 
   test(
-    'Add multiple then fetch all.',
+    'Add multiple items then fetch all.',
       () async {
         // Add multiple items by DAO
         Batch b = (await mdc.db).batch();
@@ -214,7 +214,7 @@ void main() {
   );
 
   test(
-    'Add multiple, then get multiple filtered by name.',
+    'Add multiple items, then get multiple filtered by name.',
       () async {
         // Add multiple items by DAO with specific names
         List<String> names = ['Hot Potatoes', 'Cold Potato Salad', 'Hotdog', 'Coleslaw', 'Flaminhotcheetos', 'Croque Monsieur'];

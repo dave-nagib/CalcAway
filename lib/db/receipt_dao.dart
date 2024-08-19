@@ -16,7 +16,12 @@ class ReceiptDAO extends DAO<Receipt> {
       // Add the receipt as a transaction to keep the operation atomic
       return await db.transaction((txn) async {
         // The id and timestamp are both automatic, so we insert entry to get id then query to get timestamp
-        int recId = await txn.insert('receipt', {});
+        int recId;
+        if (t.timestamp == null) { // First check if the object doesn't have a specified timestamp
+          recId = await txn.rawInsert('INSERT INTO receipt(id) VALUES(NULL);');
+        } else { // If it does have a timestamp, add it to the query
+          recId = await txn.rawInsert('INSERT INTO receipt(timestamp) VALUES(?);', [t.timestamp!.toIso8601String()]);
+        }
         var ret = (await txn.query('receipt', where: 'id = ?', whereArgs: [recId])).firstOrNull;
         if (ret == null) throw Exception('Error in finding receipt timestamp.');
         // Construct a new receipt object
@@ -28,7 +33,7 @@ class ReceiptDAO extends DAO<Receipt> {
         // Batch insert the receipt items into the receipt_details table
         Batch batch = txn.batch();
         for (var entry in t.nonZeroItems.entries) {
-          batch.insert('receipt_details', {'transact_id': recId, 'item_id': entry.key.id, 'count': entry.value});
+          batch.insert('receipt_details', {'transact_id': recId, 'item_id': entry.key.id!, 'count': entry.value});
         }
         await batch.commit();
         // Return the created Receipt object
@@ -83,7 +88,7 @@ class ReceiptDAO extends DAO<Receipt> {
     }
   }
 
-  /// Returns a list of multiple receipts without their items list from the database with filtering options. Returns null on error.
+  /// Returns a list of multiple receipts WITHOUT THEIR ITEM LISTS from the database with filtering options. Returns null on error.
   @override
   Future<List<Receipt>?> getMultiple({String? where, List<String>? whereArgs}) async {
     var db = await databaseConnection.db;
@@ -95,13 +100,13 @@ class ReceiptDAO extends DAO<Receipt> {
       } else {
         maps = await db.query('receipt', orderBy: 'timestamp DESC', where: where, whereArgs: whereArgs);
       }
-      return maps.map((e) => {
-            Receipt(
-                id: e['id'] as int,
-                timestamp: DateTime.parse(e['timestamp'] as String),
-                nonZeroItems: {}
-            )
-      }) as List<Receipt>;
+      return maps.map((Map<String, Object?> entry) =>
+          Receipt(
+              id: entry['id'] as int,
+              timestamp: DateTime.parse(entry['timestamp'] as String),
+              nonZeroItems: {}
+          )
+      ).toList();
     } on Exception catch(e,st) {
       debugPrint('Error: $e');
       debugPrintStack(stackTrace: st);

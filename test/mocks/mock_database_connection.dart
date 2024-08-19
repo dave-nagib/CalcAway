@@ -49,8 +49,8 @@ class MockDatabaseConnection implements DatabaseConnection {
   }
 
   clearTables() async {
-    await _db!.delete('item');
     await _db!.delete('receipt');
+    await _db!.delete('item');
   }
 
   close() async {
