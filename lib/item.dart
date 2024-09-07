@@ -2,7 +2,7 @@
 class Item {
   final int? id;
   final String name;
-  final double price;
+  double price;
 
   Item({
     this.id,

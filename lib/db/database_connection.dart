@@ -25,6 +25,7 @@ class DatabaseConnection {
       CREATE TABLE receipt_details (
         transact_id INTEGER NOT NULL,
         item_id INTEGER DEFAULT -1,
+        price REAL NOT NULL,
         count INTEGER NOT NULL CHECK(count > 0),
         FOREIGN KEY (transact_id) REFERENCES receipt(id) ON DELETE CASCADE,
         FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE SET DEFAULT

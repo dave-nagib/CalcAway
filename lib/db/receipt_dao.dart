@@ -33,7 +33,7 @@ class ReceiptDAO extends DAO<Receipt> {
         // Batch insert the receipt items into the receipt_details table
         Batch batch = txn.batch();
         for (var entry in t.nonZeroItems.entries) {
-          batch.insert('receipt_details', {'transact_id': recId, 'item_id': entry.key.id!, 'count': entry.value});
+          batch.insert('receipt_details', {'transact_id': recId, 'item_id': entry.key.id!, 'price': entry.key.price, 'count': entry.value});
         }
         await batch.commit();
         // Return the created Receipt object
@@ -73,7 +73,9 @@ class ReceiptDAO extends DAO<Receipt> {
       if (itemMaps.isEmpty) throw Exception('Empty receipt found.');
       for (Map entry in itemMaps) {
         var itemMap = (await db.query('item', where: 'id = ?', whereArgs: [entry['item_id']])).first;
-        items[Item.fromMap(itemMap)] = entry['count'];
+        Item item = Item.fromMap(itemMap);
+        item.price = entry['price'];
+        items[item] = entry['count'];
       }
       // Return the Receipt object
       return Receipt(
@@ -116,7 +118,6 @@ class ReceiptDAO extends DAO<Receipt> {
 
   @override
   Future<int> update(Receipt t) async {
-    // TODO: implement update
     throw UnimplementedError();
   }
 

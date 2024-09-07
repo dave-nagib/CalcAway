@@ -62,7 +62,7 @@ void main() {
         // Add corresponding items to the receipt_details table
         Batch b = (await mdc.db).batch();
         for (int i=0 ; i<names.length ; i++) {
-          b.insert('receipt_details', {'transact_id': id, 'item_id': itemsInDB[i].id, 'count': counts[i]});
+          b.insert('receipt_details', {'transact_id': id, 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b.commit();
         // Fetch receipt using DAO
@@ -116,14 +116,14 @@ void main() {
   );
 
   test(
-    'Deleting an receipt only.',
+    'Deleting a receipt only.',
       () async {
         // Add a new entry to the receipt table
         int id = await (await mdc.db).rawInsert('INSERT INTO receipt(id) VALUES(NULL);');
         // Add corresponding items to the receipt_details table
         Batch b = (await mdc.db).batch();
         for (int i=0 ; i<names.length ; i++) {
-          b.insert('receipt_details', {'transact_id': id, 'item_id': itemsInDB[i].id, 'count': counts[i]});
+          b.insert('receipt_details', {'transact_id': id, 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b.commit();
         // Delete the receipt with DAO
@@ -150,7 +150,7 @@ void main() {
         for (int i=0 ; i<3 ; i++) {
           map[itemsInDB[i]] = counts[i];
         }
-        // Add items to the item database
+        // Add receipt entry to database by DAO
         Receipt? created = await sut.add(Receipt(nonZeroItems: map));
         expect(created, isNotNull);
         expect(created!.id, isNotNull);
@@ -173,6 +173,32 @@ void main() {
   );
 
   test(
+    'Keeping old prices of updated items.',
+      () async {
+        // Add 2 test items to the database
+        Item itemToBeChanged = Item(name: 'To Be Changed', price: 20.0), dummyItem = Item(name: 'Dummy', price: 15.0);
+        itemToBeChanged = await itemDAO.add(itemToBeChanged) as Item;
+        dummyItem = await itemDAO.add(dummyItem) as Item;
+        // Construct and add a receipt by DAO
+        Receipt? rec = await sut.add(Receipt(nonZeroItems: {itemToBeChanged: 2, dummyItem: 3}));
+        // Update price of item in the database
+        itemToBeChanged.price = 30.0;
+        await itemDAO.update(itemToBeChanged);
+        // Fetch the same receipt from the database
+        Receipt? fetched = await sut.get(rec!.id!);
+        // Expect old price
+        bool found = false;
+        for (var entry in fetched!.nonZeroItems.entries) {
+          if (entry.key.name == 'To Be Changed') {
+            found = true;
+            expect(entry.key.price, 20.0);
+          }
+        }
+        expect(found, isTrue);
+      }
+  );
+
+  test(
     'Fetch all receipts only.',
       () async {
         // Add two new entries to the receipt table
@@ -182,12 +208,12 @@ void main() {
         // Add corresponding items to the receipt_details table for each receipt
         Batch b1 = (await mdc.db).batch();
         for (int i=0 ; i<names.length-3 ; i++) {
-          b1.insert('receipt_details', {'transact_id': ids[0], 'item_id': itemsInDB[i].id, 'count': counts[i]});
+          b1.insert('receipt_details', {'transact_id': ids[0], 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b1.commit();
         Batch b2 = (await mdc.db).batch();
         for (int i=names.length-3 ; i<names.length ; i++) {
-          b2.insert('receipt_details', {'transact_id': ids[1], 'item_id': itemsInDB[i].id, 'count': counts[i]});
+          b2.insert('receipt_details', {'transact_id': ids[1], 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b2.commit();
         // Fetch all receipts
