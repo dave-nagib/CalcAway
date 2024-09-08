@@ -84,4 +84,17 @@ class ItemDAO extends DAO<Item> {
     }
   }
 
+  Future<bool> nameAvailable(String name) async {
+    try {
+      var db = await databaseConnection.db;
+      // Will return the number of rows affected on normal completion
+      var itemList = await db.query('item', where: 'name = ?', whereArgs: [name]);
+      return itemList.isEmpty;
+    } on Exception catch(e,st) {
+      debugPrint('Error: $e');
+      debugPrintStack(stackTrace: st);
+      return false;
+    }
+  }
+
 }

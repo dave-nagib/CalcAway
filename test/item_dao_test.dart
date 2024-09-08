@@ -240,4 +240,13 @@ void main() {
         }
       }
   );
+
+  test(
+    'See if name is available for a new item',
+      () async {
+        await sut.add(Item(name: 'Shall Not Be Taken', price: 35.0));
+        expect(await sut.nameAvailable('Shall Not Be Taken'), isFalse);
+        expect(await sut.nameAvailable('Shall Not Be'), isTrue);
+      }
+  );
 }
