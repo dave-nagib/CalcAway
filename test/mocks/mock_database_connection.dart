@@ -10,9 +10,11 @@ class MockDatabaseConnection implements DatabaseConnection {
       CREATE TABLE item (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
-        price REAL NOT NULL
+        price REAL NOT NULL,
+        discontinued INTEGER DEFAULT FALSE
       );
     ''');
+    await db.insert('item', {'id': 0, 'name': 'deleted item', 'price': 0.0});
     await db.execute('''
       CREATE TABLE receipt (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +24,7 @@ class MockDatabaseConnection implements DatabaseConnection {
     await db.execute('''
       CREATE TABLE receipt_details (
         transact_id INTEGER NOT NULL,
-        item_id INTEGER DEFAULT -1,
+        item_id INTEGER DEFAULT 0,
         price REAL NOT NULL,
         count INTEGER NOT NULL CHECK(count > 0),
         FOREIGN KEY (transact_id) REFERENCES receipt(id) ON DELETE CASCADE,
@@ -51,7 +53,7 @@ class MockDatabaseConnection implements DatabaseConnection {
 
   clearTables() async {
     await _db!.delete('receipt');
-    await _db!.delete('item');
+    await _db!.delete('item', where: 'id > ?', whereArgs: [0]);
   }
 
   close() async {

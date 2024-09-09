@@ -13,7 +13,7 @@ class ItemDAO extends DAO<Item> {
       var db = await databaseConnection.db;
       // Return a non-negative integer with the id on normal completion
       int iid = await db.insert('item', t.toMap());
-      return Item(id: iid, name: t.name, price: t.price);
+      return Item(id: iid, name: t.name, price: t.price, discontinued: t.discontinued);
     } on Exception catch(e,st) {
       debugPrint('Error: $e');
       debugPrintStack(stackTrace: st);
@@ -31,6 +31,19 @@ class ItemDAO extends DAO<Item> {
       debugPrint('Error: $e');
       debugPrintStack(stackTrace: st);
       return -1;
+    }
+  }
+
+  Future<int> discontinue(int id) async {
+    try {
+      var db = await databaseConnection.db;
+      int rows = await db.update('item', {'discontinued': 1}, where: 'id = ?', whereArgs: [id]);
+      if (rows == 0) throw Exception('Item not found.');
+      return 1;
+    } on Exception catch(e,st) {
+      debugPrint('Error: $e');
+      debugPrintStack(stackTrace: st);
+      return 0;
     }
   }
 

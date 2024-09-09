@@ -179,7 +179,7 @@ void main() {
         // Fetch all items by DAO (the ones above)
         List<Item>? fetchedList = await sut.getMultiple();
         expect(fetchedList, isNotNull);
-        expect(fetchedList!.length, 10);
+        expect(fetchedList!.length, 11); // 10 added + 1 dummy item for deleted references
         for (int i=0 ; i<10 ; i++) {
           expect(fetchedList[i].name, createdList[i].name);
           expect(fetchedList[i].price, createdList[i].price);
@@ -203,7 +203,7 @@ void main() {
         // Fetch all items by DAO (the ones above)
         List<Item>? fetchedList = await sut.getMultiple();
         expect(fetchedList, isNotNull);
-        expect(fetchedList!.length, 10);
+        expect(fetchedList!.length, 11); // 10 added + 1 dummy item for deleted references
         for (int i=0 ; i<10 ; i++) {
           expect(fetchedList[i], isNotNull);
           expect(fetchedList[i].id, createdList[i]!.id);
@@ -247,6 +247,21 @@ void main() {
         await sut.add(Item(name: 'Shall Not Be Taken', price: 35.0));
         expect(await sut.nameAvailable('Shall Not Be Taken'), isFalse);
         expect(await sut.nameAvailable('Shall Not Be'), isTrue);
+      }
+  );
+
+  test(
+    'Discontinue an item.',
+      () async {
+        // Add item
+        int id = await (await mdc.db).insert('item', {'name': 'Discontinued Item', 'price': 99.99});
+        // Discontinue item by DAO
+        int rowsAffected = await sut.discontinue(id);
+        expect(rowsAffected, 1);
+        // Fetch item by DAO
+        Item? fetched = await sut.get(id);
+        expect(fetched, isNotNull);
+        expect(fetched!.discontinued, isTrue);
       }
   );
 }

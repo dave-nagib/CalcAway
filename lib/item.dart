@@ -3,11 +3,13 @@ class Item {
   final int? id;
   final String name;
   double price;
+  bool discontinued = false;
 
   Item({
     this.id,
     required this.name,
     required this.price,
+    this.discontinued = false
   });
 
   // TODO delete this
@@ -24,9 +26,10 @@ class Item {
       id: map['id'] as int,
       name: map['name'] as String,
       price: map['price'] as double,
+      discontinued: map['discontinued'] == 1
   );
 
-  Map<String, Object> toMap() => {'name': name, 'price': price};
+  Map<String, Object> toMap() => {'name': name, 'price': price, 'discontinued': discontinued ? 1 : 0};
 
   @override
   bool operator ==(Object other) => other is Item && id == other.id && name == other.name && price == other.price;

@@ -71,11 +71,17 @@ class ReceiptDAO extends DAO<Receipt> {
       // Fetch all items included in receipt from receipt_details
       var itemMaps = await db.query('receipt_details', where: 'transact_id = ?', whereArgs: [id]);
       if (itemMaps.isEmpty) throw Exception('Empty receipt found.');
+      int deletedCounter = 1;
       for (Map entry in itemMaps) {
-        var itemMap = (await db.query('item', where: 'id = ?', whereArgs: [entry['item_id']])).first;
-        Item item = Item.fromMap(itemMap);
-        item.price = entry['price'];
-        items[item] = entry['count'];
+        if (entry['item_id'] == 0) {
+          items[Item(id: 0, name: 'Deleted Item $deletedCounter', price: entry['price'] as double)] = entry['count'];
+          deletedCounter++;
+        } else {
+          var itemMap = (await db.query('item', where: 'id = ?', whereArgs: [entry['item_id']])).first;
+          Item item = Item.fromMap(itemMap);
+          item.price = entry['price'];
+          items[item] = entry['count'];
+        }
       }
       // Return the Receipt object
       return Receipt(

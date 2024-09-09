@@ -199,6 +199,67 @@ void main() {
   );
 
   test(
+    'Fetching receipts with deleted and discontinued items.',
+      () async {
+        // Add 2 test items to the database
+        Item deletedItem = Item(name: 'To Be Deleted', price: 20.0);
+        Item discontinuedItem = Item(name: 'To Be Discontinued', price: 15.0);
+        Item dummyItem = Item(name: 'Dummy', price: 10.0);
+        deletedItem = await itemDAO.add(deletedItem) as Item;
+        discontinuedItem = await itemDAO.add(discontinuedItem) as Item;
+        dummyItem = await itemDAO.add(dummyItem) as Item;
+        // Construct and add a receipt by DAO
+        Receipt? rec = await sut.add(Receipt(nonZeroItems: {deletedItem: 2, discontinuedItem: 3, dummyItem: 2}));
+        // Delete the deleted item
+        expect(await itemDAO.delete(deletedItem.id!), 1);
+        // Discontinue the discontinued item
+        expect(await itemDAO.discontinue(discontinuedItem.id!), 1);
+        // Fetch the same receipt from the database
+        Receipt? fetched = await sut.get(rec!.id!);
+        // Expect the receipt to have the deleted item with the correct price
+        deletedItem = Item(id: 0, name: 'Deleted Item 1', price: 20.0);
+        expect(fetched!.nonZeroItems.containsKey(deletedItem), isTrue);
+        expect(fetched.nonZeroItems[deletedItem], 2);
+        // Expect the receipt to have the discontinued item
+        expect(fetched.nonZeroItems.containsKey(discontinuedItem), isTrue);
+        expect(fetched.nonZeroItems[discontinuedItem], 3);
+        // Expect the receipt to have the dummy item
+        expect(fetched.nonZeroItems.containsKey(dummyItem), isTrue);
+        expect(fetched.nonZeroItems[dummyItem], 2);
+      }
+  );
+
+  test(
+    'Fetching receipts with multiple deleted items.',
+      () async {
+        // Add 2 test items to the database
+        Item deletedItem1 = Item(name: 'To Be Deleted 1', price: 20.0);
+        Item deletedItem2 = Item(name: 'To Be Deleted 2', price: 15.0);
+        Item dummyItem = Item(name: 'Dummy', price: 10.0);
+        deletedItem1 = await itemDAO.add(deletedItem1) as Item;
+        deletedItem2 = await itemDAO.add(deletedItem2) as Item;
+        dummyItem = await itemDAO.add(dummyItem) as Item;
+        // Construct and add a receipt by DAO
+        Receipt? rec = await sut.add(Receipt(nonZeroItems: {deletedItem1: 2, deletedItem2: 3, dummyItem: 2}));
+        // Delete the deleted items
+        await itemDAO.delete(deletedItem1.id!);
+        await itemDAO.delete(deletedItem2.id!);
+        // Fetch the same receipt from the database
+        Receipt? fetched = await sut.get(rec!.id!);
+        // Expect the receipt to have the deleted items with the correct prices
+        deletedItem1 = Item(id: 0, name: 'Deleted Item 1', price: 20.0);
+        deletedItem2 = Item(id: 0, name: 'Deleted Item 2', price: 15.0);
+        expect(fetched!.nonZeroItems.containsKey(deletedItem1), isTrue);
+        expect(fetched.nonZeroItems[deletedItem1], 2);
+        expect(fetched.nonZeroItems.containsKey(deletedItem2), isTrue);
+        expect(fetched.nonZeroItems[deletedItem2], 3);
+        // Expect the receipt to have the dummy item
+        expect(fetched.nonZeroItems.containsKey(dummyItem), isTrue);
+        expect(fetched.nonZeroItems[dummyItem], 2);
+      }
+  );
+
+  test(
     'Fetch all receipts only.',
       () async {
         // Add two new entries to the receipt table
