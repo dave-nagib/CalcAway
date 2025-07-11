@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'receipt.dart';
+import '../data/models/receipt.dart';
 
 class ReceiptWidget extends StatelessWidget {
   final Receipt receipt;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'item.dart';
-import 'receipt.dart';
+import '../data/models/item.dart';
+import '../data/models/receipt.dart';
 
 class ItemCountWidget extends StatefulWidget {
-  Item item;
-  Receipt receipt;
-  ItemCountWidget(Key key, this.item, this.receipt) : super(key: key);
+  final Item item;
+  final Receipt receipt;
+  const ItemCountWidget(Key key, this.item, this.receipt) : super(key: key);
   @override
   State<ItemCountWidget> createState() => _ItemCountWidgetState();
 }

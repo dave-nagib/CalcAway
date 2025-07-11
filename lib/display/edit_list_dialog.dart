@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'item.dart';
-import 'item_list_manager.dart';
+import '../item_list_manager.dart';
 
 class EditListDialog extends StatelessWidget {
   final ItemListManager itemManager;
@@ -134,7 +133,7 @@ class EditListDialog extends StatelessWidget {
         ),
       ],
       actionsAlignment: MainAxisAlignment.spaceEvenly,
-      actionsPadding: EdgeInsets.all(10.0),
+      actionsPadding: const EdgeInsets.all(10.0),
     );
   }
 }

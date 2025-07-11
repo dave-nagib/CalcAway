@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'edit_list_dialog.dart';
-import 'item_count_widget.dart';
-import 'receipt_widget.dart';
-import 'receipt.dart';
+import 'display/edit_list_dialog.dart';
+import 'display/item_count_widget.dart';
+import 'display/receipt_widget.dart';
+import 'data/models/receipt.dart';
 import 'item_list_manager.dart';
 
 
@@ -41,11 +41,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   Receipt mainReceipt = Receipt();
-  final ItemListManager items = ItemListManager();
+  final ItemListManager itemMgr = ItemListManager();
 
   @override
   void initState(){
-    items.readItems();
+    itemMgr.readItems();
     super.initState();
   }
 
@@ -77,8 +77,8 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: const Color(0xff08090a),
       ),
       body: ListView.builder(
-        itemCount: items.getItems().length,
-        itemBuilder: (context, index) => ItemCountWidget(const Key(''), items.getItems()[index], mainReceipt),
+        itemCount: itemMgr.getItems().length,
+        itemBuilder: (context, index) => ItemCountWidget(const Key(''), itemMgr.getItems()[index], mainReceipt),
       ),
       persistentFooterButtons: [
         Container(
@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
             backgroundColor: const Color(0xff08090a),
             onPressed: () => showAdaptiveDialog(
               context: context,
-              builder: (context) => EditListDialog(itemManager: items)
+              builder: (context) => EditListDialog(itemManager: itemMgr)
             ),
             child: const Icon(Icons.edit, color: Color(0xFFD9D9D9), size: 30.0)
           ),

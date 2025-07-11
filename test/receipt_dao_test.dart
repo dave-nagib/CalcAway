@@ -1,11 +1,11 @@
-import 'package:calc_away/db/item_dao.dart';
-import 'package:calc_away/db/receipt_dao.dart';
+import 'package:calc_away/data/db/item_dao.dart';
+import 'package:calc_away/data/db/receipt_dao.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'mocks/mock_database_connection.dart';
 import 'package:test/test.dart';
-import 'package:calc_away/item.dart';
-import 'package:calc_away/receipt.dart';
+import 'package:calc_away/data/models/item.dart';
+import 'package:calc_away/data/models/receipt.dart';
 
 void main() {
 

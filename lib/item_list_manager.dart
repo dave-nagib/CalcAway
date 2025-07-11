@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'item.dart';
+import 'data/models/item.dart';
 
 class ItemListManager {
 

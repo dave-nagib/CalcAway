@@ -1,8 +1,7 @@
-import 'package:calc_away/db/database_connection.dart';
+import 'package:calc_away/data/db/database_connection.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class MockDatabaseConnection implements DatabaseConnection {
-
   Database? _db;
 
   _create(Database db, int version) async {
@@ -35,14 +34,13 @@ class MockDatabaseConnection implements DatabaseConnection {
 
   _initialize() async {
     sqfliteFfiInit();
-    return await databaseFactoryFfi.openDatabase(
-        inMemoryDatabasePath,
+    return await databaseFactoryFfi.openDatabase(inMemoryDatabasePath,
         options: OpenDatabaseOptions(
             onCreate: _create,
             version: 1,
-            onConfigure: (Database db) async {await db.execute('PRAGMA foreign_keys = ON');}
-        )
-    );
+            onConfigure: (Database db) async {
+              await db.execute('PRAGMA foreign_keys = ON');
+            }));
   }
 
   @override
@@ -59,5 +57,4 @@ class MockDatabaseConnection implements DatabaseConnection {
   close() async {
     await _db?.close();
   }
-
 }

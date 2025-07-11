@@ -1,8 +1,8 @@
-import 'package:calc_away/db/database_connection.dart';
+import 'package:calc_away/data/db/database_connection.dart';
 import 'package:flutter/cupertino.dart';
-import '../item.dart';
+import '../models/item.dart';
 import 'package:sqflite/sqflite.dart';
-import '../receipt.dart';
+import '../models/receipt.dart';
 import 'dao.dart';
 
 class ReceiptDAO extends DAO<Receipt> {

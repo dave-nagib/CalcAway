@@ -1,7 +1,7 @@
-import 'package:calc_away/db/database_connection.dart';
+import 'package:calc_away/data/db/database_connection.dart';
 import 'package:flutter/cupertino.dart';
 import 'dao.dart';
-import '../item.dart';
+import '../models/item.dart';
 
 class ItemDAO extends DAO<Item> {
 
@@ -65,15 +65,15 @@ class ItemDAO extends DAO<Item> {
   }
 
   @override
-  Future<List<Item>?> getMultiple({String? where, List<String>? whereArgs}) async {
+  Future<List<Item>?> getMultiple({String? where, List<String>? whereArgs, String sortBy = 'name'}) async {
     try {
       var db = await databaseConnection.db;
       // Obtain a list of string : value maps ordered by the name.
       List<Map<String, Object?>> mapList;
       if (where == null) {
-        mapList = await db.query('item', orderBy: 'name');
+        mapList = await db.query('item', orderBy: sortBy);
       } else {
-        mapList = await db.query('item', orderBy: 'name', where: where, whereArgs: whereArgs);
+        mapList = await db.query('item', orderBy: sortBy, where: where, whereArgs: whereArgs);
       }
       // Returns all items on normal completion
       return mapList.map((Map<String, Object?> map) => Item.fromMap(map)).toList();
