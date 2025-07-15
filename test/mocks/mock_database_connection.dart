@@ -21,11 +21,12 @@ class MockDatabaseConnection implements DatabaseConnection {
       );
     ''');
     await db.execute('''
-      CREATE TABLE receipt_details (
+      CREATE TABLE receipt_items (
         transact_id INTEGER NOT NULL,
         item_id INTEGER DEFAULT 0,
         price REAL NOT NULL,
         count INTEGER NOT NULL CHECK(count > 0),
+        discount REAL DEFAULT 0.0 CHECK(discount >= 0.0 AND discount <= 100.0),
         FOREIGN KEY (transact_id) REFERENCES receipt(id) ON DELETE CASCADE,
         FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE SET DEFAULT
       );

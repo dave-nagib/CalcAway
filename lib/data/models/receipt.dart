@@ -5,11 +5,13 @@ class Receipt {
   final int? id;
   final DateTime? timestamp;
   final Map<Item,int> nonZeroItems;
+  final Map<int, double> discounts;
 
   Receipt({
     this.id,
     this.timestamp,
-    this.nonZeroItems = const {}
+    this.nonZeroItems = const {},
+    this.discounts = const {},
   });
 
   /// Returns true for newly added items and false for items that were already in the receipt.
@@ -30,14 +32,31 @@ class Receipt {
     return false; // Reaching this point means that count is 0 or greater than 1
   }
 
+  /// Updates the discount of an item by its ID (adding the discount if it does not exist).
+  /// Returns false if the discount percentage is invalid (<= 0 or > 100).
+  bool updateDiscount(int itemId, double discountPercentage) {
+    if (discountPercentage <= 0 || discountPercentage > 100) return false;
+    discounts[itemId] = discountPercentage;
+    return true;
+  }
+
+  /// Removes the discount of an item from the receipt. Returns false if the discount did not exist, and true otherwise.
+  bool removeDiscount(int itemId) {
+    return discounts.remove(itemId) != null;
+  }
+
   double get cost {
-    double ret = 0.0;
-    for (var entry in nonZeroItems.entries) {ret += entry.key.price * entry.value;}
+    double ret = 0.0, discountedPrice;
+    for (var entry in nonZeroItems.entries) {
+      discountedPrice = entry.key.price * (1 - (discounts[entry.key.id] ?? 0.0) / 100);
+      ret += entry.value * discountedPrice;
+    }
     return ret;
   }
 
   void reset() {
     nonZeroItems.clear();
+    discounts.clear();
   }
 
 }

@@ -28,12 +28,16 @@ class ReceiptDAO extends DAO<Receipt> {
         Receipt rec = Receipt(
             id: recId,
             timestamp: DateTime.parse(ret['timestamp'] as String),
-            nonZeroItems: t.nonZeroItems
+            nonZeroItems: t.nonZeroItems,
+            discounts: t.discounts
         );
-        // Batch insert the receipt items into the receipt_details table
+        // Batch insert the receipt items into the receipt_items table
         Batch batch = txn.batch();
         for (var entry in t.nonZeroItems.entries) {
-          batch.insert('receipt_details', {'transact_id': recId, 'item_id': entry.key.id!, 'price': entry.key.price, 'count': entry.value});
+          batch.insert(
+              'receipt_items',
+              {'transact_id': recId, 'item_id': entry.key.id!, 'price': entry.key.price, 'count': entry.value, 'discount': t.discounts[entry.key.id] ?? 0.0},
+          );
         }
         await batch.commit();
         // Return the created Receipt object
@@ -66,10 +70,11 @@ class ReceiptDAO extends DAO<Receipt> {
       // Fetch the receipt entry by id
       var idAndTime = (await db.query('receipt', where: 'id = ?', whereArgs: [id])).firstOrNull;
       if (idAndTime == null) throw Exception('Error in finding receipt entry.');
-      // Construct a new item list object
+      // Construct a new item list object and a discount list object
       Map<Item,int> items = {};
-      // Fetch all items included in receipt from receipt_details
-      var itemMaps = await db.query('receipt_details', where: 'transact_id = ?', whereArgs: [id]);
+      Map<int, double> discounts = {};
+      // Fetch all items included in receipt from receipt_items
+      var itemMaps = await db.query('receipt_items', where: 'transact_id = ?', whereArgs: [id]);
       if (itemMaps.isEmpty) throw Exception('Empty receipt found.');
       int deletedCounter = 1;
       for (Map entry in itemMaps) {
@@ -81,13 +86,17 @@ class ReceiptDAO extends DAO<Receipt> {
           Item item = Item.fromMap(itemMap);
           item.price = entry['price'];
           items[item] = entry['count'];
+          if (entry['discount'] > 0.0) {
+            discounts[entry['item_id']] = entry['discount'];
+          }
         }
       }
       // Return the Receipt object
       return Receipt(
           id: id,
           timestamp: DateTime.parse(idAndTime['timestamp'] as String),
-          nonZeroItems: items
+          nonZeroItems: items,
+          discounts: discounts
       );
     } on Exception catch(e,st) {
       debugPrint('Error: $e');
