@@ -68,10 +68,18 @@ class ItemDAO extends DAO<Item> {
   Future<List<Item>?> getMultiple({String? where, List<String>? whereArgs, String sortBy = 'name'}) async {
     try {
       var db = await databaseConnection.db;
-      // Obtain a list of string : value maps ordered by the name.
+      // Obtain a list of string : value maps ordered by the sortBy parameter.
       List<Map<String, Object?>> mapList;
-      if (where == null) {
-        mapList = await db.query('item', orderBy: sortBy);
+      if (sortBy == 'popularity') {
+        String whereStr = (where != null && where.trim().isNotEmpty)? 'WHERE $where' : '';
+        mapList = await db.rawQuery('''
+          SELECT item.*, COALESCE(SUM(receipt_items.count), 0) AS sales_count
+          FROM item
+          LEFT JOIN receipt_items ON item.id = receipt_items.item_id
+          $whereStr
+          GROUP BY item.id 
+          ORDER BY sales_count DESC
+        ''', whereArgs);
       } else {
         mapList = await db.query('item', orderBy: sortBy, where: where, whereArgs: whereArgs);
       }
@@ -107,6 +115,29 @@ class ItemDAO extends DAO<Item> {
       debugPrint('Error: $e');
       debugPrintStack(stackTrace: st);
       return false;
+    }
+  }
+
+  /// Returns a list of item-count pairs sorted in descending order of count.
+  Future<List<MapEntry<Item, int>>?> saleCounts() async {
+    try {
+      var db = await databaseConnection.db;
+      List<Map<String, Object?>> mapList = await db.rawQuery('''
+          SELECT item.*, COALESCE(SUM(receipt_items.count), 0) AS sales_count
+          FROM item
+          LEFT JOIN receipt_items ON item.id = receipt_items.item_id
+          GROUP BY item.id 
+          ORDER BY sales_count DESC
+        ''');
+        return mapList.map((Map<String, Object?> map) {
+          Item item = Item.fromMap(map);
+          int count = map['sales_count'] as int? ?? -1;
+          return MapEntry(item, count);
+        }).toList();
+    } on Exception catch(e,st) {
+      debugPrint('Error: $e');
+      debugPrintStack(stackTrace: st);
+      return null;
     }
   }
 
