@@ -34,16 +34,15 @@ class ItemDAO extends DAO<Item> {
     }
   }
 
+  /// Sets the `discontinued` flag of an item to 1 in the database. Returns the number of rows affected normally and -1 on encountering an error.
   Future<int> discontinue(int id) async {
     try {
       var db = await databaseConnection.db;
-      int rows = await db.update('item', {'discontinued': 1}, where: 'id = ?', whereArgs: [id]);
-      if (rows == 0) throw Exception('Item not found.');
-      return 1;
+      return await db.update('item', {'discontinued': 1}, where: 'id = ?', whereArgs: [id]);
     } on Exception catch(e,st) {
       debugPrint('Error: $e');
       debugPrintStack(stackTrace: st);
-      return 0;
+      return -1;
     }
   }
 
@@ -115,6 +114,21 @@ class ItemDAO extends DAO<Item> {
       debugPrint('Error: $e');
       debugPrintStack(stackTrace: st);
       return false;
+    }
+  }
+
+  Future<double?> getDiscount(int id) async {
+    var db = await databaseConnection.db;
+    try {
+      var mapList = await db.query('item_discount', where: 'id = ?', whereArgs: [id]);
+      if (mapList.isEmpty) {
+        return -1.0;
+      }
+      return mapList.map((Map<String, Object?> map) => map['discount'] as double).first;
+    } on Exception catch(e,st) {
+      debugPrint('Error: $e');
+      debugPrintStack(stackTrace: st);
+      return null;
     }
   }
 

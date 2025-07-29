@@ -14,6 +14,10 @@ class Receipt {
     this.discounts = const {},
   });
 
+  bool contains(Item t) {
+    return nonZeroItems.containsKey(t);
+  }
+
   /// Returns true for newly added items and false for items that were already in the receipt.
   bool addOneOf(Item t) {
     int count = nonZeroItems.update(t, (v) => v+1, ifAbsent: () => 1);
@@ -52,6 +56,14 @@ class Receipt {
       ret += entry.value * discountedPrice;
     }
     return ret;
+  }
+
+  int get length {
+    return nonZeroItems.length;
+  }
+
+  List<Item> get items {
+    return nonZeroItems.keys.toList();
   }
 
   void reset() {

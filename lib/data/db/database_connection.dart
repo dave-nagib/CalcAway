@@ -18,6 +18,13 @@ class DatabaseConnection {
     ''');
     await db.insert('item', {'id': 0, 'name': 'deleted item', 'price': 0.0});
     await db.execute('''
+      CREATE TABLE item_discount (
+        item_id INTEGER PRIMARY KEY,
+        discount REAL CHECK(discount >= 0.0 AND discount <= 100.0),
+        FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE CASCADE
+      );
+    ''');
+    await db.execute('''
       CREATE TABLE receipt (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT DEFAULT CURRENT_TIMESTAMP
