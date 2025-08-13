@@ -33,13 +33,13 @@ dependencies:
   path_provider: ^2.1.0
   shared_preferences: ^2.2.0
   path: ^1.8.0
-
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  intl: ^0.18.0
   cupertino_icons: ^1.0.2
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.0+4
+  url_launcher: ^6.2.4
+  icons_plus: ^5.0.0
+  another_flushbar: ^1.12.30
 
 dev_dependencies:
   flutter_test:
@@ -58,7 +58,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/books_icon.png"
+  image_path: "assets/images/calcaway-logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

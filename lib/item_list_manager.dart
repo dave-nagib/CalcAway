@@ -12,18 +12,16 @@ class ItemListManager {
   }
 
   void readItems() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    List<String>? itemsJson = pref.getStringList('items');
-    if (itemsJson != null){
-      items = itemsJson
-          .map( (str) => jsonDecode(str) ).toList()
-          .map( (dyn) => Item.fromJson(dyn) ).toList();
-    }else{
-      items = [
-        Item(name: 'Item fetching', price: 30),
-        Item(name: 'Failed', price: 40)
-      ];
-    }
+    items = [
+      Item(id: 12, name: 'Viva La Vida or Death and All His Friends', price: 30),
+      Item(id: 34, name: 'Parachutes', price: 40),
+      Item(id: 56, name: 'X & Y', price: 50),
+      Item(id: 78, name: 'A Rush of Blood to the Head', price: 2000),
+      Item(id: 91, name: 'Everyday Life', price: 60),
+      Item(id: 15, name: 'Ghost Stories', price: 45),
+      Item(id: 16, name: 'A Head Full of Dreams', price: 30),
+      Item(id: 17, name: 'Moon Music', price: 20)
+    ];
   }
 
   List<Item> getItems() => items;

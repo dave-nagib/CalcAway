@@ -10,12 +10,18 @@ class Receipt {
   Receipt({
     this.id,
     this.timestamp,
-    this.nonZeroItems = const {},
-    this.discounts = const {},
-  });
+    Map<Item, int>? nonZeroItems,
+    Map<int, double>? discounts,
+  }) : nonZeroItems = nonZeroItems ?? {},
+        discounts = discounts ?? {};
 
   bool contains(Item t) {
     return nonZeroItems.containsKey(t);
+  }
+
+  /// Returns the count of an item in the receipt.
+  int getCountOf(Item t) {
+    return nonZeroItems[t] ?? 0;
   }
 
   /// Returns true for newly added items and false for items that were already in the receipt.
@@ -34,6 +40,11 @@ class Receipt {
       nonZeroItems.update(t, (v) => v-1);
     }
     return false; // Reaching this point means that count is 0 or greater than 1
+  }
+
+  /// Returns the discount percentage of an item in the receipt.
+  double getDiscountOf(Item t) {
+    return discounts[t.id] ?? 0.0;
   }
 
   /// Updates the discount of an item by its ID (adding the discount if it does not exist).
@@ -66,7 +77,7 @@ class Receipt {
     return nonZeroItems.keys.toList();
   }
 
-  void reset() {
+  void clearItems() {
     nonZeroItems.clear();
     discounts.clear();
   }
