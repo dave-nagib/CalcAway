@@ -15,6 +15,13 @@ class MockDatabaseConnection implements DatabaseConnection {
     ''');
     await db.insert('item', {'id': 0, 'name': 'deleted item', 'price': 0.0});
     await db.execute('''
+      CREATE TABLE item_discount (
+        item_id INTEGER PRIMARY KEY,
+        discount REAL CHECK(discount >= 0.0 AND discount <= 100.0),
+        FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE CASCADE
+      );
+    ''');
+    await db.execute('''
       CREATE TABLE receipt (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT DEFAULT CURRENT_TIMESTAMP
@@ -22,12 +29,12 @@ class MockDatabaseConnection implements DatabaseConnection {
     ''');
     await db.execute('''
       CREATE TABLE receipt_items (
-        transact_id INTEGER NOT NULL,
+        receipt_id INTEGER NOT NULL,
         item_id INTEGER DEFAULT 0,
         price REAL NOT NULL,
         count INTEGER NOT NULL CHECK(count > 0),
         discount REAL DEFAULT 0.0 CHECK(discount >= 0.0 AND discount <= 100.0),
-        FOREIGN KEY (transact_id) REFERENCES receipt(id) ON DELETE CASCADE,
+        FOREIGN KEY (receipt_id) REFERENCES receipt(id) ON DELETE CASCADE,
         FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE SET DEFAULT
       );
     ''');
@@ -35,13 +42,16 @@ class MockDatabaseConnection implements DatabaseConnection {
 
   _initialize() async {
     sqfliteFfiInit();
-    return await databaseFactoryFfi.openDatabase(inMemoryDatabasePath,
+    return await databaseFactoryFfi.openDatabase(
+        inMemoryDatabasePath,
         options: OpenDatabaseOptions(
             onCreate: _create,
             version: 1,
             onConfigure: (Database db) async {
               await db.execute('PRAGMA foreign_keys = ON');
-            }));
+            }
+        )
+    );
   }
 
   @override

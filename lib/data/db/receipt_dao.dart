@@ -36,7 +36,7 @@ class ReceiptDAO extends DAO<Receipt> {
         for (var entry in t.nonZeroItems.entries) {
           batch.insert(
               'receipt_items',
-              {'transact_id': recId, 'item_id': entry.key.id!, 'price': entry.key.price, 'count': entry.value, 'discount': t.discounts[entry.key.id] ?? 0.0},
+              {'receipt_id': recId, 'item_id': entry.key.id!, 'price': entry.key.price, 'count': entry.value, 'discount': t.discounts[entry.key.id] ?? 0.0},
           );
         }
         await batch.commit();
@@ -74,7 +74,7 @@ class ReceiptDAO extends DAO<Receipt> {
       Map<Item,int> items = {};
       Map<int, double> discounts = {};
       // Fetch all items included in receipt from receipt_items
-      var itemMaps = await db.query('receipt_items', where: 'transact_id = ?', whereArgs: [id]);
+      var itemMaps = await db.query('receipt_items', where: 'receipt_id = ?', whereArgs: [id]);
       if (itemMaps.isEmpty) throw Exception('Empty receipt found.');
       int deletedCounter = 1;
       for (Map entry in itemMaps) {
