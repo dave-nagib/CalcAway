@@ -170,9 +170,10 @@ class _ReceiptExpansionTileState extends State<ReceiptExpansionTile> {
                       onPressed: () async {
                         bool? answer = await showDialog<bool>(
                             context: context,
-                            builder: (context) => const ConfirmationDialog(
+                            builder: (context) => ConfirmationDialog(
                               title: 'Confirm Deletion',
                               content: 'Are you sure you want to delete this receipt? This action cannot be undone.',
+                              action: () {},
                             )
                         );
                         if (answer != null && answer) {

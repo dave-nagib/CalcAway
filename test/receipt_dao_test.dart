@@ -62,7 +62,7 @@ void main() {
         // Add corresponding items to the receipt_items table
         Batch b = (await mdc.db).batch();
         for (int i=0 ; i<names.length ; i++) {
-          b.insert('receipt_items', {'transact_id': id, 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
+          b.insert('receipt_items', {'receipt_id': id, 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b.commit();
         // Fetch receipt using DAO
@@ -123,14 +123,14 @@ void main() {
         // Add corresponding items to the receipt_items table
         Batch b = (await mdc.db).batch();
         for (int i=0 ; i<names.length ; i++) {
-          b.insert('receipt_items', {'transact_id': id, 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
+          b.insert('receipt_items', {'receipt_id': id, 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b.commit();
         // Delete the receipt with DAO
         int affected1 = await sut.delete(id);
         expect(affected1, 1);
         // This should also automatically delete the associated rows in receipt_items
-        int affected2 = await (await mdc.db).delete('receipt_items', where: 'transact_id = ?', whereArgs: [id]);
+        int affected2 = await (await mdc.db).delete('receipt_items', where: 'receipt_id = ?', whereArgs: [id]);
         expect(affected2, 0);
       }
   );
@@ -269,12 +269,12 @@ void main() {
         // Add corresponding items to the receipt_items table for each receipt
         Batch b1 = (await mdc.db).batch();
         for (int i=0 ; i<names.length-3 ; i++) {
-          b1.insert('receipt_items', {'transact_id': ids[0], 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
+          b1.insert('receipt_items', {'receipt_id': ids[0], 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b1.commit();
         Batch b2 = (await mdc.db).batch();
         for (int i=names.length-3 ; i<names.length ; i++) {
-          b2.insert('receipt_items', {'transact_id': ids[1], 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
+          b2.insert('receipt_items', {'receipt_id': ids[1], 'item_id': itemsInDB[i].id, 'price': prices[i], 'count': counts[i]});
         }
         await b2.commit();
         // Fetch all receipts

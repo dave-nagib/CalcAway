@@ -7,10 +7,6 @@ class AnalyticsService {
   AnalyticsService(this.itemDAO);
 
   Future<List<MapEntry<Item, int>>> soldCounts() async {
-    List<MapEntry<Item, int>>? counts = await itemDAO.saleCounts();
-    if (counts == null || counts.isEmpty) {
-      return [];
-    }
-    return counts;
+    throw UnimplementedError();
   }
 }

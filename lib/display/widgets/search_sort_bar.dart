@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class SearchSortBar extends StatefulWidget {
-  const SearchSortBar({super.key});
+
+  final void Function(String searchBar, String sortBy, bool asc) onChanged;
+  final Duration searchDebounceDuration;
+
+  const SearchSortBar({required this.onChanged, this.searchDebounceDuration = const Duration(milliseconds: 500), super.key});
 
   @override
   State<SearchSortBar> createState() => _SearchSortBarState();
@@ -12,16 +16,17 @@ class _SearchSortBarState extends State<SearchSortBar> {
 
   final _searchBarController = TextEditingController();
   Timer? _searchDebounce;
+  String sortByOption = 'name';
+  bool ascending = true;
+
   void _onSearchChanged(String query) {
     if (_searchDebounce?.isActive ?? false) _searchDebounce!.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        print('Search query: $query');
-      });
-    });
+    _searchDebounce = Timer(
+      widget.searchDebounceDuration,
+      () => widget.onChanged(query, sortByOption, ascending),
+    );
   }
 
-  String sortByOption = 'Name';
   final sortByOptions = ['Name', 'Popularity ▲', 'Price ▲', 'Popularity ▼', 'Price ▼'];
 
   @override
@@ -88,10 +93,13 @@ class _SearchSortBarState extends State<SearchSortBar> {
                     ),
                   );
                 }).toList(),
-                onSelected: (String value) {
-                  // TODO handle sortBy selection
-                  sortByOption = value;
-                  print('Selected filter: $value');
+                onSelected: (String option) {
+                  final optionParts = option.split(' ');
+                  sortByOption = optionParts[0].toLowerCase();
+                  ascending = optionParts.length == 1 || optionParts[1] == '▼';
+                  setState(() {
+                    widget.onChanged(_searchBarController.text.trim(), sortByOption, ascending);
+                  });
                 },
               ),
             ],

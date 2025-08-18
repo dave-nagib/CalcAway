@@ -1,3 +1,4 @@
+import 'package:calc_away/services/shop_service.dart';
 import 'package:flutter/material.dart';
 import '../../data/models/item.dart';
 import '../../data/models/receipt.dart';
@@ -5,9 +6,9 @@ import '../../data/models/receipt.dart';
 class ItemCountTile extends StatelessWidget {
   final Item _item;
   final Receipt _receipt;
-  final VoidCallback _onActivationChanged;
+  final ShopService shopService;
 
-  const ItemCountTile(this._item, this._receipt, this._onActivationChanged, {super.key});
+  const ItemCountTile(this._item, this._receipt, this.shopService, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +58,12 @@ class ItemCountTile extends StatelessWidget {
               ],
             ),
           ),
-          _CounterContainer(_item, _receipt, _onActivationChanged), // The counter widget
+          _CounterContainer(
+            _item,
+            _receipt,
+            () => shopService.addOneOf(_item), // The add function
+            () => shopService.removeOneOf(_item) // The subtract function
+          ), // The counter widget
         ],
       ),
     );
@@ -68,9 +74,10 @@ class _CounterContainer extends StatefulWidget {
 
   final Item _item;
   final Receipt _receipt;
-  final VoidCallback _onActivationChanged;
+  final VoidCallback _onAdd;
+  final VoidCallback _onSubtract;
 
-  const _CounterContainer(this._item, this._receipt, this._onActivationChanged);
+  const _CounterContainer(this._item, this._receipt, this._onAdd, this._onSubtract);
 
   @override
   State<_CounterContainer> createState() => _CounterContainerState();
@@ -92,11 +99,7 @@ class _CounterContainerState extends State<_CounterContainer> {
             width: 53.0,
             child: FloatingActionButton( // THE SUBTRACT BUTTON
               heroTag: UniqueKey(),
-              onPressed: () => setState(() {
-                if (widget._receipt.removeOneOf(widget._item)) {
-                  widget._onActivationChanged();
-                }
-              }),
+              onPressed: () => setState(() => widget._onSubtract()),
               backgroundColor: const Color(0xFF730C0C),
               child: const Text(
                 '-',
@@ -121,11 +124,7 @@ class _CounterContainerState extends State<_CounterContainer> {
             width: 53.0,
             child: FloatingActionButton( // THE ADD BUTTON
               heroTag: UniqueKey(),
-              onPressed: () => setState(() {
-                if (widget._receipt.addOneOf(widget._item)) {
-                  widget._onActivationChanged();
-                }
-              }),
+              onPressed: () => setState(() => widget._onAdd()),
               backgroundColor: const Color(0xFF38482C),
               child: const Text(
                 '+',

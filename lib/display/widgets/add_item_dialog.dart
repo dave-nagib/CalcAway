@@ -1,6 +1,6 @@
-import 'package:calc_away/data/models/item.dart';
+import 'package:calc_away/display/helpers/flushbar_feedback.dart';
+import 'package:calc_away/services/items_page_service.dart';
 import 'package:flutter/material.dart';
-import 'package:another_flushbar/flushbar.dart';
 
 class AddItemDialog extends StatelessWidget {
 
@@ -8,8 +8,9 @@ class AddItemDialog extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _discountController = TextEditingController();
+  final ItemsPageService itemService;
 
-  AddItemDialog({super.key});
+  AddItemDialog({required this.itemService, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,53 +37,20 @@ class AddItemDialog extends StatelessWidget {
                 _NewItemTextField(
                   title: 'Name',
                   controller: _nameController,
-                  validator: (name) {
-                    if (name.isEmpty) {
-                      return 'Name cannot be empty.';
-                    }
-                    if (name.length < 5 || name.length > 50) {
-                      return 'Name must be between 5 and 50 characters long.';
-                    }
-                    if (!RegExp(r'^([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9-] ?)+$').hasMatch(name)) {
-                      return 'Name must only contain English or Arabic characters, numbers, or a hyphen -. Each word can only be separated by a single space.';
-                    }
-                    return null;
-                  },
+                  validator: itemService.nameValidator
                 ),
                 const SizedBox(height: 10.0),
                 _NewItemTextField(
                   title: 'Price',
                   controller: _priceController,
-                  validator: (price) {
-                    if (price.isEmpty) {
-                      return 'Price cannot be empty.';
-                    }
-                    if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(price)) {
-                      return 'Price must be a positive number with up to two decimal places.';
-                    }
-                    if (double.tryParse(price)! <= 0.0) {
-                      return 'Price must be greater than 0.';
-                    }
-                    return null;
-                  },
+                  validator: itemService.priceValidator,
                   numberOnly: true,
                 ),
                 const SizedBox(height: 10.0),
                 _NewItemTextField(
                   title: 'Discount %',
                   controller: _discountController,
-                  validator: (discount) {
-                    if (discount.isEmpty) {
-                      return 'Discount cannot be empty.';
-                    }
-                    if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(discount)) {
-                      return 'Discount must be a positive number with up to two decimal places.';
-                    }
-                    if (double.tryParse(discount)! <= 0.0) {
-                      return 'Discount must be greater than 0.';
-                    }
-                    return null;
-                  },
+                  validator: itemService.discountValidator,
                   numberOnly: true,
                 ),
               ],
@@ -147,38 +115,22 @@ class AddItemDialog extends StatelessWidget {
           ),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              // TODO actually add the item using the item service and display flushbar accordingly
               // Valid data
-              Flushbar(
-                duration: const Duration(seconds: 3),
-                flushbarStyle: FlushbarStyle.FLOATING,
-                backgroundColor: const Color(0xFF619025),
-                messageText: const Text(
-                  'Item added successfully.',
-                  style: TextStyle(
-                    fontFamily: 'Saira',
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ).show(context);
+              itemService.addItem(
+                _nameController.text.trim(),
+                _priceController.text.trim(),
+                _discountController.text.trim(),
+              ).then((success) {
+                if (success) {
+                  // Pop dialog and show feedback from items page
+                  Navigator.of(context).pop(true);
+                } else {
+                  showFailureFlushbar(context, 'Could not add item due to an error. Please try again.');
+                }
+              });
             } else {
               // Invalid data
-              Flushbar(
-                duration: const Duration(seconds: 3),
-                flushbarStyle: FlushbarStyle.FLOATING,
-                backgroundColor: Colors.redAccent,
-                messageText: const Text(
-                  'New item data is invalid. Please fix the errors first.',
-                  style: TextStyle(
-                    fontFamily: 'Saira',
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ).show(context);
+              showFailureFlushbar(context, 'New item data is invalid. Please fix the errors first.');
             }
           },
         ),

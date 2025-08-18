@@ -1,13 +1,14 @@
+import 'package:calc_away/display/helpers/flushbar_feedback.dart';
 import 'package:calc_away/display/widgets/add_discount_dialog.dart';
 import 'package:calc_away/display/widgets/press_and_hold_button.dart';
+import 'package:calc_away/services/checkout_service.dart';
 import 'package:flutter/material.dart';
-import '../../data/models/receipt.dart';
 
 class CheckoutPage extends StatefulWidget {
 
-  final Receipt _receipt;
+  final CheckoutService checkoutService;
 
-  const CheckoutPage({required receipt, super.key}) : _receipt = receipt;
+  const CheckoutPage({required this.checkoutService, super.key});
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -20,8 +21,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    final items = widget._receipt.items;
-    final discounts = widget._receipt.discounts;
+    final items = widget.checkoutService.receipt.items;
+    final receipt = widget.checkoutService.receipt;
 
     return WillPopScope(
       onWillPop: () async {
@@ -52,7 +53,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
               Text(
-                '£ ${widget._receipt.cost.toStringAsFixed(2)}',
+                '£ ${receipt.cost.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontFamily: 'Saira',
                   fontWeight: FontWeight.bold,
@@ -102,7 +103,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
               itemCount: items.length,
               itemBuilder: (context, index) {
                 final item = items[index];
-                final count = widget._receipt.getCountOf(item);
                 return Card(
                   color: _selectedIds.contains(item.id)? const Color(0xFF282F31): const Color(0xFF1C2022),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
@@ -165,7 +165,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   ),
                                   const SizedBox(height: 7.0),
                                   () {
-                                    final discount = discounts[item.id] ?? 0.0;
+                                    final discount = receipt.discounts[item.id] ?? 0.0;
                                     if (discount == 0.0) return const SizedBox();
                                     return Text(
                                       'Dsc. %${discount.toStringAsFixed(2)}',
@@ -199,7 +199,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     ),
                                   ),
                                   Text(
-                                    'X $count',
+                                    'X ${receipt.getCountOf(item)}',
                                     style: const TextStyle(
                                       fontSize: 22.0,
                                       fontFamily: 'Saira',
@@ -258,14 +258,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 onPressed: () async {
                                   final discount = await showDialog<double?>(
                                     context: context,
-                                    builder: (context) => AddDiscountDialog()
+                                    builder: (context) => AddDiscountDialog(validator: widget.checkoutService.discountValidator)
                                   );
                                   setState(() {
                                     if (discount != null) {
-                                      for (final id in _selectedIds) {
-                                        widget._receipt.updateDiscount(
-                                            id, discount);
-                                      }
+                                      widget.checkoutService.writeDiscount(_selectedIds.toList(), discount);
                                       _selectedIds.clear();
                                       _selectionMode = false;
                                     }
@@ -281,9 +278,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 backgroundColor: const Color(0xFF64FFD2),
                                 onPressed: () {
                                   setState(() {
-                                    for (var id in _selectedIds) {
-                                      widget._receipt.removeDiscount(id);
-                                    }
+                                    widget.checkoutService.removeDiscounts(_selectedIds.toList());
                                     _selectedIds.clear();
                                     _selectionMode = false;
                                   });
@@ -294,7 +289,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ],
                       )
                       : PressAndHoldButton(
-                          onCheckout: () => print("CHECKED OUT"), // TODO add the receipt and display flushbar accordingly
+                          onCheckout: () {
+                            widget.checkoutService.checkoutReceipt().then((success) {
+                              if (success) {
+                                showSuccessFlushbar(context, 'Receipt checked out successfully.');
+                                Navigator.pop(context);
+                              } else {
+                                showSuccessFlushbar(context, 'Error checking out receipt. Please try again.');
+                              }
+                            });
+                          },
                           label: const Text(
                             'Hold to checkout',
                             style: TextStyle(

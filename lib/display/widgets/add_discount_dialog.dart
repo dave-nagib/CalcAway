@@ -4,8 +4,9 @@ class AddDiscountDialog extends StatelessWidget {
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _discountController = TextEditingController();
+  final String? Function(String?)? validator;
 
-  AddDiscountDialog({super.key});
+  AddDiscountDialog({required this.validator, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +30,7 @@ class AddDiscountDialog extends StatelessWidget {
               autofocus: true,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               controller: _discountController,
-              validator: (discount) {
-                if (discount != null) {
-                  if (discount.isEmpty) {
-                    return 'Discount cannot be empty.';
-                  }
-                  if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(discount)) {
-                    return 'Discount must be a positive number with up to two decimal places.';
-                  }
-                  if (double.tryParse(discount)! <= 0.0) {
-                    return 'Discount must be greater than 0.';
-                  }
-                }
-                return null;
-              },
+              validator: validator,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'Discount %',

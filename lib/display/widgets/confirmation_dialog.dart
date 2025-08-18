@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String content;
+  final VoidCallback action;
 
   const ConfirmationDialog({
     this.title = 'Confirmation',
     this.content = 'Are you sure?\nThis action cannot be undone.',
+    required this.action,
     super.key
   });
 
@@ -76,7 +78,10 @@ class ConfirmationDialog extends StatelessWidget {
                 letterSpacing: 0.8
               )
           ),
-          onPressed: () => Navigator.of(context).pop(true),
+          onPressed: () {
+            action();
+            Navigator.of(context).pop(true);
+          },
         ),
       ],
     );

@@ -1,19 +1,25 @@
 import 'package:calc_away/data/models/item.dart';
+import 'package:calc_away/display/helpers/flushbar_feedback.dart';
 import 'package:calc_away/display/widgets/edit_item_dialog.dart';
+import 'package:calc_away/services/items_page_service.dart';
 import 'package:flutter/material.dart';
 import 'confirmation_dialog.dart';
 
 class ItemTile extends StatelessWidget {
 
-  final Item item;
-  final double discount;
-  final int unitsSold;
+  final (Item, int, double) itemData;
   final VoidCallback onChange; // For simplicity, we use a callback for all changes (addition, deletion, and updates)
+  final ItemsPageService itemService;
 
-  const ItemTile(this.item, this.discount, this.unitsSold, this.onChange, {super.key});
+  const ItemTile(this.itemData, this.onChange, {required this.itemService, super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    final item = itemData.$1;
+    final unitsSold = itemData.$2;
+    final discount = itemData.$3;
+
     return Card(
       elevation: 15.0,
       shadowColor: Colors.black,
@@ -113,10 +119,19 @@ class ItemTile extends StatelessWidget {
                           backgroundColor: const Color(0xFF31455A),
                           child: const Icon(Icons.edit_rounded, color: Color(0xFFD9D9D9), size: 25.0),
                           onPressed: () {
-                            showDialog(
+                            showDialog<bool>(
                               context: context,
-                              builder: (context) => EditItemDialog(item, 20.0)
-                            );
+                              builder: (context) => EditItemDialog(
+                                item: item,
+                                discount: discount,
+                                itemService: itemService,
+                              )
+                            ).then((res) {
+                              if (res != null && res) {
+                                onChange();
+                                showSuccessFlushbar(context, 'Item updated successfully.');
+                              }
+                            });
                           },
                         ),
                         FloatingActionButton( // discontinue
@@ -124,18 +139,20 @@ class ItemTile extends StatelessWidget {
                           mini: true,
                           backgroundColor: const Color(0xFF31455A),
                           child: const Icon(Icons.block, color: Color(0xFFD9D9D9), size: 25.0),
-                          onPressed: () async {
-                            bool? answer = await showDialog<bool>(
+                          onPressed: () {
+                            showDialog<bool>(
                                 context: context,
-                                builder: (context) => const ConfirmationDialog(
+                                builder: (context) => ConfirmationDialog(
                                   title: 'Confirm Discontinuation',
                                   content: 'Are you sure you want to discontinue this item? This action cannot be undone.',
+                                  action: () => itemService.discontinueItem(item.id!),
                                 )
-                            );
-                            if (answer != null && answer) {
-                              onChange();
-                              // TODO flushbar discontinuation feedback
-                            }
+                            ).then((answer) {
+                              if (answer != null && answer) {
+                                onChange();
+                                showSuccessFlushbar(context, 'Item discontinued successfully.');
+                              }
+                            });
                           },
                         ),
                         FloatingActionButton( // delete
@@ -143,18 +160,20 @@ class ItemTile extends StatelessWidget {
                           mini: true,
                           backgroundColor: const Color(0xFF31455A),
                           child: const Icon(Icons.delete_rounded, color: Color(0xFFD9D9D9), size: 25.0),
-                          onPressed: () async {
-                            bool? answer = await showDialog<bool>(
+                          onPressed: () {
+                            showDialog<bool>(
                                 context: context,
-                                builder: (context) => const ConfirmationDialog(
+                                builder: (context) => ConfirmationDialog(
                                   title: 'Confirm Deletion',
                                   content: 'Are you sure you want to delete this item? This action cannot be undone.',
+                                  action: () => itemService.deleteItem(item.id!),
                                 )
-                            );
-                            if (answer != null && answer) {
-                              onChange();
-                              // TODO flushbar deletion feedback
-                            }
+                            ).then((answer) {
+                              if (answer != null && answer) {
+                                onChange();
+                                showSuccessFlushbar(context, 'Item discontinued successfully.');
+                              }
+                            });
                           },
                         ),
                       ],

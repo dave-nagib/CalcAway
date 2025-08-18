@@ -20,15 +20,28 @@ class CheckoutService {
     }
   }
 
-  /// Adds a discount to a group of items
-  void addDiscount(List<int> itemIds, double discount) {
+  String? discountValidator(String? discount) {
+    if (discount == null || discount.isEmpty) {
+      return 'Discount cannot be empty.';
+    }
+    if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(discount)) {
+      return 'Discount must be a positive percentage with up to two decimal places.';
+    }
+    if (double.tryParse(discount)! <= 0.0) {
+      return 'Discount must be greater than 0 and less or equal to 100.';
+    }
+    return null;
+  }
+
+  /// Writes (and overwrites) a discount to a group of items
+  void writeDiscount(List<int> itemIds, double discount) {
     for (int id in itemIds) {
       receipt.updateDiscount(id, discount);
     }
   }
 
   /// Removes discounts from a group of items
-  void removeDiscount(List<int> itemIds) {
+  void removeDiscounts(List<int> itemIds) {
     for (int id in itemIds) {
       receipt.removeDiscount(id);
     }
