@@ -46,9 +46,9 @@ class ItemTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Spacer(flex: 2),
+                const Spacer(flex: 1),
                 Expanded(
-                  flex: 4,
+                  flex: 5,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -57,7 +57,7 @@ class ItemTile extends StatelessWidget {
                         '£${item.price.toStringAsFixed(2)}',
                         style: const TextStyle(
                           color: Color(0xFFD9D9D9),
-                          fontSize: 25.0,
+                          fontSize: 22.5,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'Monaco',
                         ),

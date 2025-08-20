@@ -4,6 +4,8 @@ import 'database_connection.dart';
 
 class DevDatabaseConnection extends DatabaseConnection {
 
+  static Database? _devDb;
+
   _dbCreate(Database db, int version) async {
     // Create tables as in the parent class
     await db.execute('''
@@ -44,35 +46,35 @@ class DevDatabaseConnection extends DatabaseConnection {
   Future<void> _populateTestData(Database db) async {
     return db.transaction((txn) async {
       // Insert 7 items into the item table
-      await txn.insert('item', {'name': 'Item A', 'price': 10.0}); // 1
-      await txn.insert('item', {'name': 'Item B', 'price': 50.0}); // 2
-      await txn.insert('item', {'name': 'أيتم سي دوني', 'price': 100.0}); // 3
-      await txn.insert('item', {'name': 'An astonishing peculiar exquisite whimsical item', 'price': 500.0}); // 4
-      await txn.insert('item', {'name': 'Item 3amer', 'price': 1000.0}); // 5
-      await txn.insert('item', {'name': 'أيتم عربي اسمه طويل شويتين معلش بقى دنيا هنعمل ايه', 'price': 200.0}); // 6
-      await txn.insert('item', {'name': 'Item D', 'price': 300.0}); // 7
+      int id1 = await txn.insert('item', {'name': 'Item A', 'price': 10.0}); // 1
+      int id2 = await txn.insert('item', {'name': 'Item B', 'price': 50.0}); // 2
+      int id3 = await txn.insert('item', {'name': 'أيتم سي دوني', 'price': 100.0}); // 3
+      int id4 = await txn.insert('item', {'name': 'An astonishing peculiar exquisite whimsical item', 'price': 500.0}); // 4
+      int id5 = await txn.insert('item', {'name': 'Item 3amer', 'price': 1000.0}); // 5
+      int id6 = await txn.insert('item', {'name': 'أيتم عربي اسمه طويل شويتين معلش بقى دنيا هنعمل ايه', 'price': 200.0}); // 6
+      int id7 = await txn.insert('item', {'name': 'Item D', 'price': 300.0}); // 7
 
       // Insert 3 discounts into the item_discount table
-      await txn.insert('item_discount', {'item_id': 3, 'discount': 80.0});
-      await txn.insert('item_discount', {'item_id': 2, 'discount': 10.0});
-      await txn.insert('item_discount', {'item_id': 4, 'discount': 15.0});
+      await txn.insert('item_discount', {'item_id': id3, 'discount': 80.0});
+      await txn.insert('item_discount', {'item_id': id2, 'discount': 10.0});
+      await txn.insert('item_discount', {'item_id': id4, 'discount': 15.0});
 
       // Insert 4 receipts into the receipt table
-      int receipt1 = await txn.insert('receipt', {});
-      await txn.insert('receipt_items', {'receipt_id': receipt1, 'item_id': 1, 'price': 10.0, 'count': 10, 'discount': 0.0});
-      await txn.insert('receipt_items', {'receipt_id': receipt1, 'item_id': 2, 'price': 50.0, 'count': 2, 'discount': 10.0});
-      await txn.insert('receipt_items', {'receipt_id': receipt1, 'item_id': 3, 'price': 100.0, 'count': 6, 'discount': 80.0});
+      int receipt1 = await txn.insert('receipt', {}, nullColumnHack: 'id');
+      await txn.insert('receipt_items', {'receipt_id': receipt1, 'item_id': id1, 'price': 10.0, 'count': 10, 'discount': 0.0});
+      await txn.insert('receipt_items', {'receipt_id': receipt1, 'item_id': id2, 'price': 50.0, 'count': 2, 'discount': 10.0});
+      await txn.insert('receipt_items', {'receipt_id': receipt1, 'item_id': id3, 'price': 100.0, 'count': 6, 'discount': 80.0});
 
-      int receipt2 = await txn.insert('receipt', {});
-      await txn.insert('receipt_items', {'receipt_id': receipt2, 'item_id': 4, 'price': 500.0, 'count': 1, 'discount': 15.0});
+      int receipt2 = await txn.insert('receipt', {}, nullColumnHack: 'id');
+      await txn.insert('receipt_items', {'receipt_id': receipt2, 'item_id': id4, 'price': 500.0, 'count': 1, 'discount': 15.0});
 
-      int receipt3 = await txn.insert('receipt', {});
-      await txn.insert('receipt_items', {'receipt_id': receipt3, 'item_id': 5, 'price': 1000.0, 'count': 12, 'discount': 0.0});
-      await txn.insert('receipt_items', {'receipt_id': receipt3, 'item_id': 6, 'price': 200.0, 'count': 1, 'discount': 50.0});
+      int receipt3 = await txn.insert('receipt', {}, nullColumnHack: 'id');
+      await txn.insert('receipt_items', {'receipt_id': receipt3, 'item_id': id5, 'price': 1000.0, 'count': 12, 'discount': 0.0});
+      await txn.insert('receipt_items', {'receipt_id': receipt3, 'item_id': id6, 'price': 200.0, 'count': 1, 'discount': 50.0});
 
-      int receipt4 = await txn.insert('receipt', {});
-      await txn.insert('receipt_items', {'receipt_id': receipt4, 'item_id': 6, 'price': 200.0, 'count': 4, 'discount': 0.0});
-      await txn.insert('receipt_items', {'receipt_id': receipt4, 'item_id': 7, 'price': 300.0, 'count': 2, 'discount': 0.0});
+      int receipt4 = await txn.insert('receipt', {}, nullColumnHack: 'id');
+      await txn.insert('receipt_items', {'receipt_id': receipt4, 'item_id': id6, 'price': 200.0, 'count': 4, 'discount': 0.0});
+      await txn.insert('receipt_items', {'receipt_id': receipt4, 'item_id': id7, 'price': 300.0, 'count': 2, 'discount': 0.0});
     });
   }
 
@@ -95,5 +97,11 @@ class DevDatabaseConnection extends DatabaseConnection {
         await _populateTestData(db);
       },
     );
+  }
+
+  @override
+  Future<Database> get db async {
+    _devDb ??= await _initializeDatabase();
+    return _devDb!;
   }
 }

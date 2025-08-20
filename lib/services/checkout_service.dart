@@ -1,5 +1,4 @@
 import 'package:calc_away/data/models/receipt.dart';
-import 'package:calc_away/data/models/item.dart';
 import 'package:calc_away/data/db/receipt_dao.dart';
 import 'package:calc_away/data/db/item_dao.dart';
 
@@ -9,15 +8,14 @@ class CheckoutService {
   ReceiptDAO receiptDAO;
   ItemDAO itemDAO;
 
-  CheckoutService(this.receipt, this.receiptDAO, this.itemDAO) {
+  CheckoutService(this.receipt, this.receiptDAO, this.itemDAO);
+
+  Future<void> setDefaultDiscounts() async {
     // Fetch default discounts for the receipt items
-    for (Item item in receipt.items) {
-      double discount = -1.0;
-      itemDAO.getDiscount(item.id!).then((value) => {discount = value ?? -1.0});
-      if (discount > 0.0) {
-        receipt.updateDiscount(item.id!, discount);
-      }
-    }
+    Map<int, double> defaultDiscounts = await itemDAO.getDiscounts(
+        receipt.items.map((t) => t.id!)
+    );
+    receipt.setDiscounts(defaultDiscounts);
   }
 
   String? discountValidator(String? discount) {

@@ -60,6 +60,11 @@ class Receipt {
     return discounts.remove(itemId) != null;
   }
 
+  void setDiscounts(Map<int, double> newDiscounts) {
+    discounts.clear();
+    discounts.addAll(newDiscounts);
+  }
+
   double get cost {
     double ret = 0.0, discountedPrice;
     for (var entry in nonZeroItems.entries) {

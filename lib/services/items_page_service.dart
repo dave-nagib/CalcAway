@@ -106,7 +106,7 @@ class ItemsPageService {
         ascending: ascending
     );
     if (itemsList == null) {return null;}
-    final ids = itemsList.map((e) => e.id!).toList();
+    final ids = itemsList.map((t) => t.id!);
     final soldCounts = await itemDAO.saleCounts(ids);
     final discounts = await itemDAO.getDiscounts(ids);
     List<(Item item, int soldCount, double discount)> itemTuples = [];

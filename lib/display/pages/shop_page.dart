@@ -19,8 +19,6 @@ class ShopPage extends StatefulWidget {
   State<ShopPage> createState() => _ShopPageState();
 
   CheckoutService get derivedCheckoutService {
-    // Reset any discounts for a new checkout
-    shopService.activeReceipt.discounts.clear();
     return CheckoutService(
       shopService.activeReceipt,
       ReceiptDAO(shopService.itemDAO.databaseConnection),
@@ -36,7 +34,7 @@ class _ShopPageState extends State<ShopPage> {
   @override
   void initState() {
     super.initState();
-    _itemsFuture = widget.shopService.fetchItems('', 'Name', true);
+    _itemsFuture = widget.shopService.fetchItems('', 'name', true);
   }
 
   void _refreshItems(String searchBar, String sortBy, bool ascending) {
@@ -53,36 +51,35 @@ class _ShopPageState extends State<ShopPage> {
       backgroundColor: const Color(0xFF202C39),
       appBar: const CalcawayAppBar(),
       drawer: const DrawerNavigator(),
-      body: FutureBuilder<List<Item>?>(
-        future: _itemsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFFC6FFEE), strokeWidth: 4.0));
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) { // TODO handle null vs empty
-            return const Center(child: Text('No items found.'));
-          }
-
-          List<Item> items = snapshot.data!;
-          return Stack(
-            children: [
-              Positioned.fill(
+      body: Stack(
+        children: [
+          FutureBuilder<List<Item>?>(
+            future: _itemsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator(color: Color(0xFFC6FFEE), strokeWidth: 4.0));
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) { // TODO handle null vs empty
+                return const Center(child: Text('No items found.'));
+              }
+              List<Item> items = snapshot.data!;
+              return Positioned.fill(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(top: 70.0),
                   itemCount: items.length,
                   itemBuilder: (context, index) => ItemCountTile(items[index], activeReceipt, widget.shopService)
                 ),
-              ),
-              Positioned(
-                top: 0.0,
-                left: 0.0,
-                right: 0.0,
-                child: SearchSortBar(onChanged: _refreshItems),
-              ),
-            ],
-          );
-        },
+              );
+            }
+          ),
+          Positioned(
+            top: 0.0,
+            left: 0.0,
+            right: 0.0,
+            child: SearchSortBar(onChanged: _refreshItems),
+          ),
+        ],
       ),
       persistentFooterButtons: [
         Container(

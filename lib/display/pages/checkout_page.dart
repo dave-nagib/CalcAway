@@ -18,6 +18,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   bool _selectionMode = false;
   Set<int> _selectedIds = <int>{};
+  late Future<void> _defaultDiscountsFetched;
+
+  @override
+  void initState() {
+    super.initState();
+    _defaultDiscountsFetched = widget.checkoutService.setDefaultDiscounts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +59,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   letterSpacing: 1.8,
                 ),
               ),
-              Text(
-                '£ ${receipt.cost.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontFamily: 'Saira',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 50,
-                  color: Color(0xFFF5F749),
-                  // color: Colors.orangeAccent,
-                  letterSpacing: 3.0,
-                ),
+              FutureBuilder<void>(
+                future: _defaultDiscountsFetched,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator(color: Color(0xFFF5F749), strokeWidth: 3.0);
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
+                  return Text(
+                    '£ ${receipt.cost.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontFamily: 'Saira',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 50,
+                      color: Color(0xFFF5F749),
+                      // color: Colors.orangeAccent,
+                      letterSpacing: 3.0,
+                    ),
+                  );
+                }
               ),
             ],
           ),
@@ -98,124 +115,148 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
         body: Stack(
           children: [
-            ListView.builder(
-              padding: const EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 80.0),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return Card(
-                  color: _selectedIds.contains(item.id)? const Color(0xFF282F31): const Color(0xFF1C2022),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
-                  elevation: 12.0,
-                  margin: const EdgeInsets.symmetric(vertical: 7.5),
-                  child: InkWell(
-                    splashColor: const Color(0xFF282F31),
-                    onTap: () {
-                      if (_selectionMode) {
-                        setState(() {
-                          if (_selectedIds.contains(item.id!)) {
-                            _selectedIds.remove(item.id!);
-                          } else {
-                            _selectedIds.add(item.id!);
+            FutureBuilder<void>(
+              future: _defaultDiscountsFetched,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator(color: Color(0xFF99E3DA), strokeWidth: 3.0);
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 80.0),
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return Card(
+                      color: _selectedIds.contains(item.id)
+                          ? const Color(0xFF282F31)
+                          : const Color(0xFF1C2022),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0)),
+                      elevation: 12.0,
+                      margin: const EdgeInsets.symmetric(vertical: 7.5),
+                      child: InkWell(
+                        splashColor: const Color(0xFF282F31),
+                        onTap: () {
+                          if (_selectionMode) {
+                            setState(() {
+                              if (_selectedIds.contains(item.id!)) {
+                                _selectedIds.remove(item.id!);
+                              } else {
+                                _selectedIds.add(item.id!);
+                              }
+                            });
                           }
-                        });
-                      }
-                    },
-                    onLongPress: () {
-                      if (!_selectionMode) {
-                        setState(() {
-                          _selectionMode = true;
-                          _selectedIds.add(item.id!);
-                        });
-                      }
-                    },
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 80.0),
-                      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 23.0),
-                      child: IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            _selectionMode
-                                ? Expanded(
-                                  flex: 2,
-                                  child: Icon(
-                                      _selectedIds.contains(item.id)? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-                                      color: Colors.white,
-                                      size: 28.0,
-                                    ),
-                                )
-                                : const SizedBox(),
-                            _selectionMode? const Spacer(flex: 2) : const SizedBox(),
-                            Expanded(
-                              flex: 13,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.name,
-                                    style: const TextStyle(
-                                      fontSize: 20.0,
-                                      fontFamily: 'Saira',
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.4,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 7.0),
-                                  () {
-                                    final discount = receipt.discounts[item.id] ?? 0.0;
-                                    if (discount == 0.0) return const SizedBox();
-                                    return Text(
-                                      'Dsc. %${discount.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontSize: 19.0,
-                                        fontFamily: 'Saira',
-                                        letterSpacing: 0.7,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFFFF871F),
+                        },
+                        onLongPress: () {
+                          if (!_selectionMode) {
+                            setState(() {
+                              _selectionMode = true;
+                              _selectedIds.add(item.id!);
+                            });
+                          }
+                        },
+                        child: Container(
+                          constraints: const BoxConstraints(minHeight: 80.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 23.0),
+                          child: IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                _selectionMode
+                                    ? Expanded(
+                                        flex: 2,
+                                        child: Icon(
+                                          _selectedIds.contains(item.id)
+                                              ? Icons.check_box_rounded
+                                              : Icons
+                                                  .check_box_outline_blank_rounded,
+                                          color: Colors.white,
+                                          size: 28.0,
+                                        ),
+                                      )
+                                    : const SizedBox(),
+                                _selectionMode
+                                    ? const Spacer(flex: 2)
+                                    : const SizedBox(),
+                                Expanded(
+                                  flex: 13,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.name,
+                                        style: const TextStyle(
+                                          fontSize: 20.0,
+                                          fontFamily: 'Saira',
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.4,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    );
-                                  }(),
-                                ],
-                              ),
-                            ),
-                            const Spacer(flex: 3),
-                            Expanded(
-                              flex: item.price >= 1000.0? 9 : 6,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '£ ${(item.price).toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 22.0,
-                                      fontFamily: 'Saira',
-                                      letterSpacing: 0.7,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF99E3DA),
-                                    ),
+                                      const SizedBox(height: 7.0),
+                                      () {
+                                        final discount =
+                                            receipt.discounts[item.id] ?? 0.0;
+                                        if (discount == 0.0)
+                                          return const SizedBox();
+                                        return Text(
+                                          'Dsc. %${discount.toStringAsFixed(2)}',
+                                          style: const TextStyle(
+                                            fontSize: 19.0,
+                                            fontFamily: 'Saira',
+                                            letterSpacing: 0.7,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFFFF871F),
+                                          ),
+                                        );
+                                      }(),
+                                    ],
                                   ),
-                                  Text(
-                                    'X ${receipt.getCountOf(item)}',
-                                    style: const TextStyle(
-                                      fontSize: 22.0,
-                                      fontFamily: 'Saira',
-                                      letterSpacing: 0.7,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
+                                ),
+                                const Spacer(flex: 3),
+                                Expanded(
+                                  flex: item.price >= 1000.0 ? 9 : 6,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        '£ ${(item.price).toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          fontSize: 22.0,
+                                          fontFamily: 'Saira',
+                                          letterSpacing: 0.7,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF99E3DA),
+                                        ),
+                                      ),
+                                      Text(
+                                        'X ${receipt.getCountOf(item)}',
+                                        style: const TextStyle(
+                                          fontSize: 22.0,
+                                          fontFamily: 'Saira',
+                                          letterSpacing: 0.7,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 );
               },
             ),

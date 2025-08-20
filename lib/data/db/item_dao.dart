@@ -76,17 +76,22 @@ class ItemDAO extends DAO<Item> {
       // Obtain a list of string : value maps ordered by the sortBy parameter.
       List<Map<String, Object?>> mapList;
       if (sortBy == 'popularity') {
-        String whereStr = (where != null && where.trim().isNotEmpty)? 'WHERE $where' : '';
+        String whereStr = (where != null && where.trim().isNotEmpty)? 'AND $where' : '';
         mapList = await db.rawQuery('''
           SELECT item.*, COALESCE(SUM(receipt_items.count), 0) AS sales_count
           FROM item
           LEFT JOIN receipt_items ON item.id = receipt_items.item_id
-          $whereStr
+          WHERE item.id > 0 $whereStr
           GROUP BY item.id 
           ORDER BY sales_count ${ascending? 'ASC' : 'DESC'}
         ''', whereArgs);
       } else {
-        mapList = await db.query('item', orderBy: sortBy + (ascending? 'ASC' : 'DESC'), where: where, whereArgs: whereArgs);
+        mapList = await db.query(
+          'item',
+          orderBy: sortBy + (ascending? ' ASC' : ' DESC'),
+          where: 'item.id > 0 ${where != null && where.trim().isNotEmpty? 'AND $where' : ''}'.trim(),
+          whereArgs: whereArgs
+        );
       }
       // Returns all items on normal completion
       return mapList.map((Map<String, Object?> map) => Item.fromMap(map)).toList();
@@ -137,7 +142,7 @@ class ItemDAO extends DAO<Item> {
   Future<double?> getDiscount(int id) async {
     var db = await databaseConnection.db;
     try {
-      var mapList = await db.query('item_discount', where: 'id = ?', whereArgs: [id]);
+      var mapList = await db.query('item_discount', where: 'item_id = ?', whereArgs: [id]);
       if (mapList.isEmpty) {
         return 0.0;
       }
@@ -151,10 +156,10 @@ class ItemDAO extends DAO<Item> {
 
   /// Returns a map of item id: discount pairs given a list of item ids.
   /// Items with no default discount will not be included in the map.
-  Future<Map<int, double>> getDiscounts(List<int> ids) async {
+  Future<Map<int, double>> getDiscounts(Iterable<int> ids) async {
     try {
       var db = await databaseConnection.db;
-      var mapList = await db.query('item_discount', where: 'id IN (${ids.join(', ')})');
+      var mapList = await db.query('item_discount', where: 'item_id IN (${ids.join(', ')})');
       Map<int, double> discounts = {};
       for (final map in mapList) {
         discounts[map['item_id'] as int] = map['discount'] as double;
@@ -180,7 +185,7 @@ class ItemDAO extends DAO<Item> {
   }
 
   /// Returns a map of item id: count pairs given a list of item ids.
-  Future<Map<int, int>> saleCounts(List<int> ids) async {
+  Future<Map<int, int>> saleCounts(Iterable<int> ids) async {
     try {
       var db = await databaseConnection.db;
       List<Map<String, Object?>> mapList = await db.rawQuery('''

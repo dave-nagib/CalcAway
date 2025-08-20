@@ -27,7 +27,13 @@ class _SearchSortBarState extends State<SearchSortBar> {
     );
   }
 
-  final sortByOptions = ['Name', 'Popularity ▲', 'Price ▲', 'Popularity ▼', 'Price ▼'];
+  final List<(String, bool)> sortByOptions = [
+    ('Name', true),
+    ('Popularity', true),
+    ('Price', true),
+    ('Popularity', false),
+    ('Price', false)
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -62,28 +68,32 @@ class _SearchSortBarState extends State<SearchSortBar> {
             trailing: [
               IconButton(
                 icon: const Icon(Icons.clear_rounded, color: Color(0xFFD9D9D9), size: 30.0),
-                onPressed: () => _searchBarController.clear(),
+                onPressed: () {
+                  _searchBarController.clear();
+                  _onSearchChanged('');
+                },
               ),
-              PopupMenuButton<String>(
+              PopupMenuButton<(String, bool)>(
                 color: const Color(0xFF626876),
                 elevation: 60.0,
                 shadowColor: Colors.black,
                 icon: const Icon(Icons.sort_rounded, color: Colors.white),
-                itemBuilder: (context) => sortByOptions.map((String option) {
-                  return PopupMenuItem<String>(
+                itemBuilder: (context) => sortByOptions.map((option) {
+                  final selected = option.$1.toLowerCase() == sortByOption && option.$2 == ascending;
+                  return PopupMenuItem<(String, bool)>(
                     value: option,
                     child: Row(
                         children: [
                           Icon(
-                            option == sortByOption ? Icons.check : null,
+                            selected? Icons.check : null,
                             color: Colors.white,
                             size: 18,
                           ),
                           const SizedBox(width: 8.0),
                           Text(
-                              option,
+                              option.$1 + (option.$2 ? ' ▼' : ' ▲'),
                               style: TextStyle(
-                                color: option == sortByOption ? Colors.white : Colors.white38,
+                                color: selected? Colors.white : Colors.white38,
                                 fontFamily: 'Saira',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18.0,
@@ -93,10 +103,9 @@ class _SearchSortBarState extends State<SearchSortBar> {
                     ),
                   );
                 }).toList(),
-                onSelected: (String option) {
-                  final optionParts = option.split(' ');
-                  sortByOption = optionParts[0].toLowerCase();
-                  ascending = optionParts.length == 1 || optionParts[1] == '▼';
+                onSelected: (option) {
+                  sortByOption = option.$1.toLowerCase();
+                  ascending = option.$2;
                   setState(() {
                     widget.onChanged(_searchBarController.text.trim(), sortByOption, ascending);
                   });
