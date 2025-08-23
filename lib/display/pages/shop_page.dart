@@ -1,4 +1,5 @@
 import 'package:calc_away/data/db/receipt_dao.dart';
+import 'package:calc_away/display/helpers/flushbar_feedback.dart';
 import 'package:calc_away/services/checkout_service.dart';
 import 'package:calc_away/services/shop_service.dart';
 import 'package:flutter/material.dart';
@@ -96,10 +97,15 @@ class _ShopPageState extends State<ShopPage> {
           child: FloatingActionButton(
               heroTag: 'checkout',
               backgroundColor: const Color(0xFF08090A),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
+              onPressed: () async {
+                await Navigator.push(context, MaterialPageRoute(
                     builder: (context) => CheckoutPage(checkoutService: widget.derivedCheckoutService)
-                ));
+                )).then((checkoutSuccess) {
+                  if (checkoutSuccess ?? false) {
+                    setState(() => widget.shopService.resetReceipt());
+                    showSuccessFlushbar(context, 'Checkout successful.');
+                  }
+                });
               },
               child: const Icon(Icons.shopping_cart_checkout_rounded, color: Color(0xFFD9D9D9), size: 30.0)
           ),

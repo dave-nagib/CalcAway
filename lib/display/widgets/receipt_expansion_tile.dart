@@ -1,4 +1,5 @@
 import 'package:calc_away/data/models/receipt.dart';
+import 'package:calc_away/display/helpers/flushbar_feedback.dart';
 import 'package:calc_away/display/widgets/confirmation_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 
 class ReceiptExpansionTile extends StatefulWidget {
   final Receipt receipt;
-  final AsyncValueGetter<Receipt> getReceiptData;
+  final AsyncValueGetter<Receipt?> getReceiptData;
   final VoidCallback onDelete;
 
   const ReceiptExpansionTile(this.receipt, this.getReceiptData, this.onDelete, {super.key});
@@ -79,7 +80,7 @@ class _ReceiptExpansionTileState extends State<ReceiptExpansionTile> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No items found.'));
+                  return const Center(child: Text('No receipt items found.'));
                 } else {
                   return Column(children: snapshot.data!);
                 }
@@ -91,8 +92,9 @@ class _ReceiptExpansionTileState extends State<ReceiptExpansionTile> {
     );
   }
 
-  Future<List<Widget>> _loadExpandedContent() async {
-    Receipt fetched = await widget.getReceiptData();
+  Future<List<Widget>?> _loadExpandedContent() async {
+    Receipt? fetched = await widget.getReceiptData();
+    if (fetched == null) return null;
     widget.receipt.nonZeroItems.addAll(fetched.nonZeroItems);
     widget.receipt.discounts.addAll(fetched.discounts);
     return [
@@ -159,27 +161,27 @@ class _ReceiptExpansionTileState extends State<ReceiptExpansionTile> {
                   const Spacer(flex: 2),
                   const Expanded(flex: 13, child: Text('Total', style: ReceiptExpansionTile.receiptStyle)),
                   const Spacer(flex: 1),
-                  Expanded(flex: 6, child: Text(widget.receipt.cost.toStringAsFixed(2), style: ReceiptExpansionTile.receiptStyle)),
+                  Expanded(flex: 7, child: Text(widget.receipt.cost.toStringAsFixed(2), style: ReceiptExpansionTile.receiptStyle)),
                   Expanded(
-                    flex: 7,
+                    flex: 6,
                     child: FloatingActionButton( // delete
                       heroTag: UniqueKey(),
                       mini: true,
                       backgroundColor: const Color(0xD7460909),
                       child: const Icon(Icons.delete_rounded, color: Colors.white54, size: 25.0),
                       onPressed: () async {
-                        bool? answer = await showDialog<bool>(
+                        showDialog<bool>(
                             context: context,
                             builder: (context) => ConfirmationDialog(
                               title: 'Confirm Deletion',
                               content: 'Are you sure you want to delete this receipt? This action cannot be undone.',
-                              action: () {},
+                              action: widget.onDelete,
                             )
-                        );
-                        if (answer != null && answer) {
-                          widget.onDelete();
-                          // TODO receipt deletion flushbar
-                        }
+                        ).then((answer) {
+                          if (answer != null && answer) {
+                            showSuccessFlushbar(context, 'Receipt deleted successfully.');
+                          }
+                        });
                       },
                     ),
                   ),

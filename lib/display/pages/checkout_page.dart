@@ -203,8 +203,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       () {
                                         final discount =
                                             receipt.discounts[item.id] ?? 0.0;
-                                        if (discount == 0.0)
-                                          return const SizedBox();
+                                        if (discount == 0.0) return const SizedBox();
                                         return Text(
                                           'Dsc. %${discount.toStringAsFixed(2)}',
                                           style: const TextStyle(
@@ -333,8 +332,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           onCheckout: () {
                             widget.checkoutService.checkoutReceipt().then((success) {
                               if (success) {
-                                showSuccessFlushbar(context, 'Receipt checked out successfully.');
-                                Navigator.pop(context);
+                                Navigator.pop(context, true);
                               } else {
                                 showSuccessFlushbar(context, 'Error checking out receipt. Please try again.');
                               }

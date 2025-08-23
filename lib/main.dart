@@ -1,6 +1,8 @@
 import 'package:calc_away/data/db/dev_database_connection.dart';
 import 'package:calc_away/data/db/item_dao.dart';
+import 'package:calc_away/data/db/receipt_dao.dart';
 import 'package:calc_away/services/items_page_service.dart';
+import 'package:calc_away/services/receipts_page_service.dart';
 import 'package:calc_away/services/shop_service.dart';
 import 'display/pages/about_page.dart';
 import 'display/pages/items_page.dart';
@@ -16,7 +18,7 @@ void main() {
     routes: {
       '/shop': (context) => ShopPage(shopService: ShopService(ItemDAO(DevDatabaseConnection()))),
       '/items': (context) => ItemsPage(itemService: ItemsPageService(ItemDAO(DevDatabaseConnection()))),
-      '/receipts': (context) => const ReceiptsPage(),
+      '/receipts': (context) => ReceiptsPage(receiptsService: ReceiptsPageService(ReceiptDAO(DevDatabaseConnection()))),
       '/about': (context) => const AboutPage(),
     },
   ));

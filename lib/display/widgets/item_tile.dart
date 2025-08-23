@@ -171,7 +171,7 @@ class ItemTile extends StatelessWidget {
                             ).then((answer) {
                               if (answer != null && answer) {
                                 onChange();
-                                showSuccessFlushbar(context, 'Item discontinued successfully.');
+                                showSuccessFlushbar(context, 'Item deleted successfully.');
                               }
                             });
                           },
