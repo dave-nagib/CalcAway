@@ -27,7 +27,7 @@ class ReceiptDAO extends DAO<Receipt> {
         // Construct a new receipt object
         Receipt rec = Receipt(
             id: recId,
-            timestamp: DateTime.parse(ret['timestamp'] as String),
+            timestamp: DateTime.parse(ret['timestamp'] as String).toUtc().toLocal(),
             nonZeroItems: t.nonZeroItems,
             discounts: t.discounts
         );
@@ -94,7 +94,7 @@ class ReceiptDAO extends DAO<Receipt> {
       // Return the Receipt object
       return Receipt(
           id: id,
-          timestamp: DateTime.parse(idAndTime['timestamp'] as String),
+          timestamp: DateTime.parse(idAndTime['timestamp'] as String).toUtc().toLocal(),
           nonZeroItems: items,
           discounts: discounts
       );
@@ -120,7 +120,7 @@ class ReceiptDAO extends DAO<Receipt> {
       return maps.map((Map<String, Object?> entry) =>
           Receipt(
               id: entry['id'] as int,
-              timestamp: DateTime.parse(entry['timestamp'] as String),
+              timestamp: DateTime.parse(entry['timestamp'] as String).toUtc().toLocal(),
               nonZeroItems: {}
           )
       ).toList();

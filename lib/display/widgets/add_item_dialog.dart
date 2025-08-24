@@ -37,7 +37,7 @@ class AddItemDialog extends StatelessWidget {
                 _NewItemTextField(
                   title: 'Name',
                   controller: _nameController,
-                  validator: itemService.nameValidator
+                  validator: itemService.newNameValidator
                 ),
                 const SizedBox(height: 10.0),
                 _NewItemTextField(

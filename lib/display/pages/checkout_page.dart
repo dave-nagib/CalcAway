@@ -220,7 +220,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                                 const Spacer(flex: 3),
                                 Expanded(
-                                  flex: item.price >= 1000.0 ? 9 : 6,
+                                  flex: item.price >= 1000.0 ? 9 : 7,
                                   child: Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -348,7 +348,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                           ),
                           color: const Color(0xFF64FFD2),
-                          holdDuration: const Duration(milliseconds: 1200),
+                          holdDuration: const Duration(milliseconds: 750),
                         ),
                 ),
               ),

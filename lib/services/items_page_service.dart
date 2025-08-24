@@ -3,8 +3,8 @@ import '../data/models/item.dart';
 
 class ItemsPageService {
   ItemDAO itemDAO;
-  static const maxNameLength = 50;
-  static const minNameLength = 4;
+  static const maxNameLength = 70;
+  static const minNameLength = 5;
 
   ItemsPageService(this.itemDAO);
 
@@ -54,8 +54,14 @@ class ItemsPageService {
     if (!RegExp(r'^([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9-] ?)+$').hasMatch(name)) {
       return 'Name must only contain English or Arabic characters, numbers, or a hyphen -. Each word can only be separated by a single space.';
     }
+    return null;
+  }
+
+  String? newNameValidator(String? name) {
+    final basicValidation = nameValidator(name);
+    if (basicValidation != null) return basicValidation;
     bool validName = false;
-    itemDAO.nameAvailable(name).then((value) => {validName = value});
+    itemDAO.nameAvailable(name!).then((value) => {validName = value});
     if (!validName) {
       return 'Name is not available.';
     }
@@ -80,11 +86,11 @@ class ItemsPageService {
       return null;
     }
     if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(discount)) {
-      return 'Discount must be a positive percentage with up to two decimal places.';
+      return 'Discount % must be a positive percentage with up to two decimal places.';
     }
     double parsedDiscount = double.tryParse(discount)!;
-    if (parsedDiscount <= 0.0 || parsedDiscount > 100.0) {
-      return 'Discount must be greater than 0 and less or equal to 100.';
+    if (parsedDiscount < 0.0 || parsedDiscount > 100.0) {
+      return 'Discount % must be between 0 and 100';
     }
     return null;
   }

@@ -20,13 +20,14 @@ class CheckoutService {
 
   String? discountValidator(String? discount) {
     if (discount == null || discount.isEmpty) {
-      return 'Discount cannot be empty.';
+      return 'Discount % cannot be empty.';
     }
     if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(discount)) {
-      return 'Discount must be a positive percentage with up to two decimal places.';
+      return 'Discount % must be a positive percentage with up to two decimal places.';
     }
-    if (double.tryParse(discount)! <= 0.0) {
-      return 'Discount must be greater than 0 and less or equal to 100.';
+    final parsedDiscount = double.tryParse(discount)!;
+    if (parsedDiscount <= 0.0 || parsedDiscount > 100.0) {
+      return 'Discount % must be greater than 0 and less or equal to 100.';
     }
     return null;
   }

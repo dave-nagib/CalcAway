@@ -48,41 +48,40 @@ class _ItemsPageState extends State<ItemsPage> {
       backgroundColor: const Color(0xFF18212A),
       appBar: const CalcawayAppBar(),
       drawer: const DrawerNavigator(),
-      body: FutureBuilder<List<(Item, int, double)>?>(
-        future: _itemTuplesFuture, // Called in each rebuild
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFFC6FFEE), strokeWidth: 4.0));
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) { // TODO handle null vs empty
-            return const Center(child: Text('No items found.'));
-          }
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: FutureBuilder<List<(Item, int, double)>?>(
+              future: _itemTuplesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator(color: Color(0xFFC6FFEE), strokeWidth: 4.0));
+                } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) { // TODO handle null vs empty
+                return const Center(child: Text('No items found.'));
+                }
 
-          itemTuples = snapshot.data!;
-
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: ListView.builder(
+                itemTuples = snapshot.data!;
+                return ListView.builder(
                   padding: const EdgeInsets.only(top: 80.0),
                   itemCount: itemTuples.length,
                   itemBuilder: (context, index) => ItemTile(
-                      itemTuples[index],
-                      itemService: widget.itemService,
-                      () => setState(() => _refreshItems(_searchBar, _sortBy, _ascending)) // Refresh the state after any deletion
+                    itemTuples[index],
+                    itemService: widget.itemService,
+                    () => setState(() => _refreshItems(_searchBar, _sortBy, _ascending)) // Refresh the state after any deletion
                   ),
-                ),
-              ),
-              Positioned(
-                top: 0.0,
-                left: 0.0,
-                right: 0.0,
-                child: SearchSortBar(onChanged: _refreshItems),
-              ),
-            ],
-          );
-        }
+                );
+              }
+            ),
+          ),
+          Positioned(
+            top: 0.0,
+            left: 0.0,
+            right: 0.0,
+            child: SearchSortBar(onChanged: _refreshItems),
+          ),
+        ],
       ),
       floatingActionButton: SizedBox(
         width: 70.0,
