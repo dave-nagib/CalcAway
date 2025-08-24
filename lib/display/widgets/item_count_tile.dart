@@ -1,14 +1,12 @@
 import 'package:calc_away/services/shop_service.dart';
 import 'package:flutter/material.dart';
 import '../../data/models/item.dart';
-import '../../data/models/receipt.dart';
 
 class ItemCountTile extends StatelessWidget {
   final Item _item;
-  final Receipt _receipt;
   final ShopService shopService;
 
-  const ItemCountTile(this._item, this._receipt, this.shopService, {super.key});
+  const ItemCountTile(this._item, this.shopService, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +56,7 @@ class ItemCountTile extends StatelessWidget {
               ],
             ),
           ),
-          _CounterContainer(
-            _item,
-            _receipt,
-            () => shopService.addOneOf(_item), // The add function
-            () => shopService.removeOneOf(_item) // The subtract function
-          ), // The counter widget
+          _CounterContainer(_item, shopService), // The counter widget
         ],
       ),
     );
@@ -73,11 +66,9 @@ class ItemCountTile extends StatelessWidget {
 class _CounterContainer extends StatefulWidget {
 
   final Item _item;
-  final Receipt _receipt;
-  final VoidCallback _onAdd;
-  final VoidCallback _onSubtract;
+  final ShopService shopService;
 
-  const _CounterContainer(this._item, this._receipt, this._onAdd, this._onSubtract);
+  const _CounterContainer(this._item, this.shopService);
 
   @override
   State<_CounterContainer> createState() => _CounterContainerState();
@@ -85,7 +76,7 @@ class _CounterContainer extends StatefulWidget {
 
 class _CounterContainerState extends State<_CounterContainer> {
 
-  Color? _getCountColor () => (widget._receipt.getCountOf(widget._item) == 0)? const Color(0xff253b3d) : const Color(0xffC6EBBE);
+  Color? _getCountColor () => (widget.shopService.getCountOf(widget._item) == 0)? const Color(0xff253b3d) : const Color(0xffC6EBBE);
 
   @override
   Widget build(BuildContext context) {
@@ -97,22 +88,25 @@ class _CounterContainerState extends State<_CounterContainer> {
         children: [
           SizedBox(
             width: 53.0,
-            child: FloatingActionButton( // THE SUBTRACT BUTTON
-              heroTag: UniqueKey(),
-              onPressed: () => setState(() => widget._onSubtract()),
-              backgroundColor: const Color(0xFF730C0C),
-              child: const Text(
-                '-',
-                style: TextStyle(
-                    fontSize: 35.0,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold
+            child: GestureDetector(
+              onLongPress: () => setState(() => widget.shopService.zeroOut(widget._item)),
+              child: FloatingActionButton( // THE SUBTRACT BUTTON
+                heroTag: 'subtract-item-${widget._item.id}',
+                onPressed: () => setState(() => widget.shopService.removeOneOf(widget._item)),
+                backgroundColor: const Color(0xFF730C0C),
+                child: const Text(
+                  '-',
+                  style: TextStyle(
+                      fontSize: 35.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold
+                  ),
                 ),
               ),
             ),
           ),
           Text(
-            '${widget._receipt.getCountOf(widget._item)}',
+            '${widget.shopService.getCountOf(widget._item)}',
             style: TextStyle(
                 color: _getCountColor(),
                 fontFamily: 'Saira',
@@ -123,8 +117,8 @@ class _CounterContainerState extends State<_CounterContainer> {
           SizedBox(
             width: 53.0,
             child: FloatingActionButton( // THE ADD BUTTON
-              heroTag: UniqueKey(),
-              onPressed: () => setState(() => widget._onAdd()),
+              heroTag: 'add-item-${widget._item.id}',
+              onPressed: () => setState(() => widget.shopService.addOneOf(widget._item)),
               backgroundColor: const Color(0xFF38482C),
               child: const Text(
                 '+',

@@ -98,5 +98,8 @@ class ShopService {
     // itemList.sort((a,b) => _itemOrder[a.id]!.compareTo(_itemOrder[b.id]!));
   }
 
+  int getCountOf(Item t) => activeReceipt.getCountOf(t);
+
+  void zeroOut(Item t) => activeReceipt.removeCompletely(t);
 
 }

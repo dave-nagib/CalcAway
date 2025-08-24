@@ -42,6 +42,8 @@ class Receipt {
     return false; // Reaching this point means that count is 0 or greater than 1
   }
 
+  void removeCompletely(Item t) => nonZeroItems.remove(t);
+
   /// Returns the discount percentage of an item in the receipt.
   double getDiscountOf(Item t) {
     return discounts[t.id] ?? 0.0;

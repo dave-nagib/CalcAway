@@ -3,7 +3,6 @@ import 'package:calc_away/display/helpers/flushbar_feedback.dart';
 import 'package:calc_away/services/checkout_service.dart';
 import 'package:calc_away/services/shop_service.dart';
 import 'package:flutter/material.dart';
-import 'package:calc_away/data/models/receipt.dart';
 import 'package:calc_away/display/widgets/calcaway_app_bar.dart';
 import 'package:calc_away/display/widgets/item_count_tile.dart';
 import 'package:calc_away/display/widgets/search_sort_bar.dart';
@@ -47,7 +46,6 @@ class _ShopPageState extends State<ShopPage> {
   @override
   Widget build(BuildContext context) {
 
-    Receipt activeReceipt = widget.shopService.activeReceipt;
     return Scaffold(
       backgroundColor: const Color(0xFF202C39),
       appBar: const CalcawayAppBar(),
@@ -69,7 +67,7 @@ class _ShopPageState extends State<ShopPage> {
                 child: ListView.builder(
                   padding: const EdgeInsets.only(top: 70.0),
                   itemCount: items.length,
-                  itemBuilder: (context, index) => ItemCountTile(items[index], activeReceipt, widget.shopService)
+                  itemBuilder: (context, index) => ItemCountTile(items[index], widget.shopService)
                 ),
               );
             }
