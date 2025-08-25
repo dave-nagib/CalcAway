@@ -30,7 +30,6 @@ class PressAndHoldButton extends StatefulWidget {
 class _PressAndHoldButtonState extends State<PressAndHoldButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  AnimationStatus? _animationStatus;
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _PressAndHoldButtonState extends State<PressAndHoldButton>
       vsync: this,
       duration: widget.holdDuration,
     )..addStatusListener((status) {
-      _animationStatus = status;
       if (status == AnimationStatus.completed) {
         HapticFeedback.mediumImpact();
         widget.onCheckout();

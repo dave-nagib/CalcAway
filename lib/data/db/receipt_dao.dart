@@ -79,6 +79,7 @@ class ReceiptDAO extends DAO<Receipt> {
       int deletedCounter = 1;
       for (Map entry in itemMaps) {
         if (entry['item_id'] == 0) {
+          // Count the deleted items to avoid collisions in the items map when deleted items have the same price
           items[Item(id: 0, name: 'Deleted Item $deletedCounter', price: entry['price'] as double)] = entry['count'];
           deletedCounter++;
         } else {

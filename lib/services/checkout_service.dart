@@ -4,11 +4,11 @@ import 'package:calc_away/data/db/item_dao.dart';
 
 class CheckoutService {
 
-  Receipt receipt;
-  ReceiptDAO receiptDAO;
-  ItemDAO itemDAO;
+  final Receipt receipt;
+  final ReceiptDAO receiptDAO;
+  final ItemDAO itemDAO;
 
-  CheckoutService(this.receipt, this.receiptDAO, this.itemDAO);
+  const CheckoutService(this.receipt, this.receiptDAO, this.itemDAO);
 
   Future<void> setDefaultDiscounts() async {
     // Fetch default discounts for the receipt items

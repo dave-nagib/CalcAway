@@ -69,7 +69,7 @@ class _ItemsPageState extends State<ItemsPage> {
                   itemBuilder: (context, index) => ItemTile(
                     itemTuples[index],
                     itemService: widget.itemService,
-                    () => setState(() => _refreshItems(_searchBar, _sortBy, _ascending)) // Refresh the state after any deletion
+                    () => _refreshItems(_searchBar, _sortBy, _ascending) // Refresh the state after any change
                   ),
                 );
               }

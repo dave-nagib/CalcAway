@@ -145,8 +145,7 @@ void main() {
     // Fetch all items by DAO (the ones above)
     List<Item>? fetchedList = await sut.getMultiple();
     expect(fetchedList, isNotNull);
-    expect(fetchedList!.length,
-        11); // 10 added + 1 dummy item for deleted references
+    expect(fetchedList!.length, 10);
     for (int i = 0; i < 10; i++) {
       expect(fetchedList[i].name, createdList[i].name);
       expect(fetchedList[i].price, createdList[i].price);
@@ -167,8 +166,7 @@ void main() {
     // Fetch all items by DAO (the ones above)
     List<Item>? fetchedList = await sut.getMultiple();
     expect(fetchedList, isNotNull);
-    expect(fetchedList!.length,
-        11); // 10 added + 1 dummy item for deleted references
+    expect(fetchedList!.length, 10);
     for (int i = 0; i < 10; i++) {
       expect(fetchedList[i], isNotNull);
       expect(fetchedList[i].id, createdList[i]!.id);

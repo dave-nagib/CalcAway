@@ -17,7 +17,7 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
 
   bool _selectionMode = false;
-  Set<int> _selectedIds = <int>{};
+  final Set<int> _selectedIds = <int>{};
   late Future<void> _defaultDiscountsFetched;
 
   @override
@@ -106,7 +106,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   if (_selectedIds.length == items.length) {
                     _selectedIds.clear();
                   } else {
-                    _selectedIds = Set<int>.from(items.map((t) => t.id));
+                    _selectedIds.addAll(items.map((t) => t.id!));
                   }
                 });
               },

@@ -2,11 +2,11 @@ import 'package:calc_away/data/db/item_dao.dart';
 import '../data/models/item.dart';
 
 class ItemsPageService {
-  ItemDAO itemDAO;
+  final ItemDAO itemDAO;
   static const maxNameLength = 70;
   static const minNameLength = 5;
 
-  ItemsPageService(this.itemDAO);
+  const ItemsPageService(this.itemDAO);
 
   /// Adds a new item to the database. The passed name and price are guaranteed to be valid. Returns a string with status.
   Future<bool> addItem(String name, String price, String dsc) async {

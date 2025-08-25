@@ -3,9 +3,9 @@ import 'package:calc_away/data/models/receipt.dart';
 
 class ReceiptsPageService {
 
-  ReceiptDAO receiptDAO;
+  final ReceiptDAO receiptDAO;
 
-  ReceiptsPageService(this.receiptDAO);
+  const ReceiptsPageService(this.receiptDAO);
 
   Future<List<Receipt>?> fetchIdsAndTimeStamps() async {
     return await receiptDAO.getMultiple();

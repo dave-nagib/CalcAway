@@ -90,15 +90,20 @@ class _SearchSortBarState extends State<SearchSortBar> {
                             size: 18,
                           ),
                           const SizedBox(width: 8.0),
-                          Text(
-                              option.$1 + (option.$2 ? ' ▼' : ' ▲'),
+                          RichText(
+                            text: TextSpan(
                               style: TextStyle(
                                 color: selected? Colors.white : Colors.white38,
                                 fontFamily: 'Saira',
                                 fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              )
-                          ),
+                                fontSize: 20.0,
+                              ),
+                              children: [
+                                TextSpan(text: option.$1),
+                                TextSpan(text: option.$2 ? ' ⬇' : ' ⬆', style: const TextStyle(fontSize: 27.0))
+                              ]
+                            ),
+                          )
                         ]
                     ),
                   );
@@ -106,9 +111,7 @@ class _SearchSortBarState extends State<SearchSortBar> {
                 onSelected: (option) {
                   sortByOption = option.$1.toLowerCase();
                   ascending = option.$2;
-                  setState(() {
-                    widget.onChanged(_searchBarController.text.trim(), sortByOption, ascending);
-                  });
+                  widget.onChanged(_searchBarController.text.trim(), sortByOption, ascending);
                 },
               ),
             ],

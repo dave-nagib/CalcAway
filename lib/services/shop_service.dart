@@ -6,7 +6,7 @@ class ShopService {
   // late List<Item> itemList;
   // bool errorFlag = false;
   // Map<int, int> _itemOrder = {};
-  Receipt activeReceipt = Receipt();
+  final Receipt activeReceipt = Receipt();
   // int _inactiveItemsStart = 0;
   final ItemDAO itemDAO;
 
@@ -94,7 +94,7 @@ class ShopService {
   /// Resets the current receipt to an empty one, pushing active items to their original order
   void resetReceipt() {
     // _inactiveItemsStart = 0;
-    activeReceipt = Receipt();
+    activeReceipt.clearItems();
     // itemList.sort((a,b) => _itemOrder[a.id]!.compareTo(_itemOrder[b.id]!));
   }
 
